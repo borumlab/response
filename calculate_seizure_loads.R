@@ -130,6 +130,8 @@ missing_sums <- function(x,y,q) {
       
       lowsums <- c()
       upsums <- c()
+      lownumbers <- c()
+      upnumbers <- c() 
       
       lo <- lower; up <- upper
       
@@ -157,6 +159,7 @@ missing_sums <- function(x,y,q) {
         for (u in (a-1):1) {
           if (as.numeric(as.character(y[u])) != 3) {
             upsums <- c(x[u,9],upsums)
+            upnumbers <- c(x[u,8],upnumbers)
             upday <- c(upperday,upday)
             upcount <- c(upperday,upcount)
             temp <- data.frame(x[u,1])
@@ -179,20 +182,22 @@ missing_sums <- function(x,y,q) {
         } 
         
         upday[] <- max(upday) - upday[]
-        upsumday <- rbind(upsums,upday,upcount)
+        upsumday <- rbind(upsums,upnumbers,upday,upcount)
         
         if (up != 0) {
           c <- upsums
-          d <- upday
+          d <- upnumbers
+          e <- upday
           upsums <- c()
           upday <- c()
           upcount <- c()
           for (s in 0:(upper-1)) {
-            upsums <- c(upsums,c[d[]==(s%%(max(d)+1))])
-            upday <- c(upday,d[d[]==(s%%(max(d)+1))])
+            upsums <- c(upsums,c[e[]==(s%%(max(e)+1))])
+            upnumbers <- c(upnumbers,d[e[]==(s%%(max(e)+1))])
+            upday <- c(upday,e[e[]==(s%%(max(e)+1))])
             upcount <- c(upcount,rep(s,length(upsums)-length(upcount)))
           }
-          upsumday <- rbind(upsums,upday,upcount)
+          upsumday <- rbind(upsums,upnumbers,upday,upcount)
         }
         
         
@@ -206,6 +211,7 @@ missing_sums <- function(x,y,q) {
           
           if (as.numeric(as.character(y[l])) != 3) {
             lowsums <- c(lowsums,x[l,9])
+            lownumbers <- c(lownumbers,x[l,8])
             lowday <- c(lowday,lowerday)
             lowcount <- c(lowcount,lowerday)
             temp <- data.frame(x[l,1])
@@ -228,20 +234,22 @@ missing_sums <- function(x,y,q) {
         }
         
         lowday[] <- max(lowday) - lowday[]
-        lowsumday <- rbind(lowsums,lowday,lowcount)
+        lowsumday <- rbind(lowsums,lownumbers,lowday,lowcount)
         
         if (lo != 0) {
           c <- lowsums
-          d <- lowday
+          d <- lownumbers
+          e <- lowday
           lowsums <- c()
           lowday <- c()
           lowcount <- c()
           for (s in 0:(lower-1)) {
-            lowsums <- c(c[d[]==(s%%(max(d)+1))],lowsums)
-            lowday <- c(d[d[]==(s%%(max(d)+1))],lowday)
+            lowsums <- c(c[e[]==(s%%(max(e)+1))],lowsums)
+            lownumbers <- c(d[e[]==(s%%(max(e)+1))],lownumbers)
+            lowday <- c(e[e[]==(s%%(max(e)+1))],lowday)
             lowcount <- c(rep(s,length(lowsums)-length(lowcount)),lowcount)
           }
-          lowsumday <- rbind(lowsums,lowday,lowcount)
+          lowsumday <- rbind(lowsums,lownumbers,lowday,lowcount)
         }
         
       } 
@@ -252,7 +260,7 @@ missing_sums <- function(x,y,q) {
       if ((dim(lowernadates)[1] > 0)) {
         new <- c()
         for (n in 1:(dim(lowernadates)[1])) {
-          newrows <- data.frame(lowernadates[n,1],unique(x[x[,1]==lowernadates[n,1],2]),NA,NA,NA,NA,NA,NA,lowsumday[1,lowsumday[3,]==n-1])
+          newrows <- data.frame(lowernadates[n,1],unique(x[x[,1]==lowernadates[n,1],2]),NA,NA,NA,NA,NA,lowsumday[2,lowsumday[4,]==n-1],lowsumday[1,lowsumday[4,]==n-1])
           colnames(newrows) <- colnames(temp)
           if (is.null(new)) {
             new <- newrows
@@ -274,7 +282,7 @@ missing_sums <- function(x,y,q) {
         new <- c()
         for (n in 1:(dim(uppernadates)[1])) {
           t <- (dim(uppernadates)[1])-n
-          newrows <- data.frame(uppernadates[n,1],unique(x[x[,1]==uppernadates[n,1],2]),NA,NA,NA,NA,NA,NA,upsumday[1,upsumday[3,]==t])
+          newrows <- data.frame(uppernadates[n,1],unique(x[x[,1]==uppernadates[n,1],2]),NA,NA,NA,NA,NA,upsumday[2,upsumday[4,]==t],upsumday[1,upsumday[4,]==t])
           colnames(newrows) <- colnames(x)
           if (is.null(new)) {
             new <- newrows
@@ -407,7 +415,8 @@ seizure_load_calculation <- function() {
   values <- missing_sums(values,data[,4])
   colnames(values)[2] <- "day type"
   
-  load <- rep(0,dim(values)[1])
+  seizure.load.per.day <- rep(NA,dim(values)[1])
+  seizure.number.per.day <- rep(NA,dim(values)[1])
   
   print("Now calculating daily seizure loads. Please wait...")
   
@@ -417,11 +426,11 @@ seizure_load_calculation <- function() {
       k <- k - 1
     } else {
       k <- 0
-      load[i] <- values[i,9]
+      seizure.load.per.day[i] <- values[i,9]
+      seizure.number.per.day[i] <- values[i,8]
       if (i != dim(values)[1]) {
         for (j in 1:(dim(values)[1]-i)) {
           if (values[(i+j),1] == values[i,1]) {
-            load[(i+j)] <- NA
             k <- k + 1
           } else if (values[(i+j),1] != values[i,9]) {
             break
@@ -430,19 +439,22 @@ seizure_load_calculation <- function() {
       }
       if (k > 0) {
         for (m in 1:k) {
-          load[i] <- as.numeric(load[i]) + as.numeric(values[(i+m),9])
+          seizure.load.per.day[i] <- as.numeric(seizure.load.per.day[i]) + as.numeric(values[(i+m),9])
+          seizure.number.per.day[i] <- as.numeric(seizure.number.per.day[i]) + as.numeric(values[(i+m),8])
         }
       }
     }
   }
   
-  values <- data.frame(values,load)
+  values <- data.frame(values,seizure.number.per.day,seizure.load.per.day)
   colnames(values)[1] <- "date"
+  
+  #return(values)
   
   print("Set the work directory in which you would like to save this file")
   wd <- readline(prompt="Enter here: ")
   setwd(wd)
   print("Give the name you would like to give to the file. Make sure to add the .csv at the end")
   csv <- readline(prompt="Enter here: ")
-  write.csv(values,file=csv,na="")
+  write.csv(values,file=csv,na="",row.names=FALSE)
 }

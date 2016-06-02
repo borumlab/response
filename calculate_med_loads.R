@@ -177,12 +177,19 @@ med_load_calculation <- function() {
     med_load[med_load[,1]==i,9][1] <- sum(med_load[med_load[,1]==i,8])  
   }
   
+  med.number.per.day <- rep(NA,dim(med_load)[1])
+  med_load <- data.frame(med_load,med.number.per.day)
+  colnames(med_load)[10] <- "med.number.per.day"
+  for (i in unique(med_load[,1])) {
+    med_load[med_load[,1]==i,10][1] <- length(med_load[med_load[,1]==i & med_load[,6]!=0,6])
+  }
+  
   print("Set the work directory in which you would like to save this file")
   wd <- readline(prompt="Enter here: ")
   setwd(wd)
   print("Give the name you would like to give to the file. Make sure to add the .csv at the end")
   csv <- readline(prompt="Enter here: ")
-  write.csv(med_load,file=csv,na="")
+  write.csv(med_load,file=csv,na="",row.names=FALSE)
   
   if (!require("astsa")) {
     install.packages("astsa")
