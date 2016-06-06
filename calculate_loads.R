@@ -330,6 +330,11 @@ missing_sums <- function(x,y,q) {
 
 load_calculation <- function() {
   
+  if (!require("xlsx")) {
+    install.packages("xlsx")
+  }
+  library(xlsx)
+  
   print("Input the directory that you wish to draw this patient's data from")
   print("Example: C:/Folder_Name/")
   directory <- readline(prompt="Enter here: ")
@@ -339,22 +344,23 @@ load_calculation <- function() {
   print("Example: JoLe")
   patient <- readline(prompt="Enter here: ")
   
-  print("Input the name of the patient data file you would like to use (leave off the .csv and the patient letters)")
+  print("Input the name of the patient data file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   data <- readline(prompt="Enter here: ")
   
-  data <- gsub(" .csv",".csv",paste(data,".csv"))
+  data <- gsub(" .xlsx",".xlsx",paste(data,".xlsx"))
   data <- gsub(" ","",paste(patient,"_",data))
-  data <- read.csv(data,header=TRUE)
+  data <- read.xlsx(data,sheetIndex=1)
   
-  print("Input the name of the ranking table file you would like to use (leave off the .csv and the patient letters)")
+  print("Input the name of the ranking table file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   ranking <- readline(prompt="Enter here: ")
   
-  ranking <- gsub(" .csv",".csv",paste(ranking,".csv"))
+  ranking <- gsub(" .xlsx",".xlsx",paste(ranking,".xlsx"))
   ranking <- gsub(" ","",paste(patient,"_",ranking))
-  ranking <- read.csv(ranking,header=TRUE)
+  ranking <- read.xlsx(ranking,sheetIndex=1)
   
+  mrnumber <- unique(data[,1])
   data <- data[!is.na(data[,1]),]
   for (i in 1:length(data[,1])) {
     if (nchar(as.character(data[i,2]))>10) {
@@ -455,44 +461,47 @@ load_calculation <- function() {
     }
   }
   
-  seizure_load <- data.frame(values,seizure.number.per.day,seizure.load.per.day)
-  colnames(seizure_load)[1] <- "date"
+  seizure_load <- data.frame(cbind(rep(mrnumber,length(seizure.load.per.day))),values,seizure.number.per.day,seizure.load.per.day)
+  colnames(seizure_load)[1] <- "MRNUMBER"
+  colnames(seizure_load)[2] <- "date"
 
-  print("Give the name you would like to give to the file (leave off the .csv and the patient letters")
-  csv <- readline(prompt="Enter here: ")
-  csv <- gsub(" .csv",".csv",paste(csv,".csv"))
-  csv <- gsub(" ","",paste(patient,"_",csv))
-  write.csv(seizure_load,file=csv,na="",row.names=FALSE)
+  print("Give the name you would like to give to the file (leave off the .xlsx and the patient letters)")
+  xlsx <- readline(prompt="Enter here: ")
+  xlsx <- gsub(" .xlsx",".xlsx",paste(xlsx,".xlsx"))
+  xlsx <- gsub(" ","",paste(patient,"_",xlsx))
+  write.xlsx(seizure_load,file=xlsx,showNA=FALSE,row.names=FALSE)
   
-  ## Read in all relevant data from csv files
-  print("Input the name of the patient raw data file you would like to use (leave off the .csv and the patient letters)")
+  return(1)
+  
+  ## Read in all relevant data from xlsx files
+  print("Input the name of the patient raw data file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   data <- readline(prompt="Enter here: ")
   
-  data <- gsub(" .csv",".csv",paste(data,".csv"))
+  data <- gsub(" .xlsx",".xlsx",paste(data,".xlsx"))
   data <- gsub(" ","",paste(patient,"_",data))
-  data <- read.csv(data,header=TRUE)
+  data <- read.xlsx(data,sheetIndex=1)
 
-  print("Input the name of the anthropometrics file you would like to use (leave off the .csv and the patient letters)")
+  print("Input the name of the anthropometrics file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   anthro <- readline(prompt="Enter here: ")
   
-  anthro <- gsub(" .csv",".csv",paste(anthro,".csv"))
-  anthro <- read.csv(anthro,header=TRUE)
+  anthro <- gsub(" .xlsx",".xlsx",paste(anthro,".xlsx"))
+  anthro <- read.xlsx(anthro,sheetIndex=1)
   
-  print("Input the name of the demographics file you would like to use (leave off the .csv and the patient letters)")
+  print("Input the name of the demographics file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   demo <- readline(prompt="Enter here: ")
   
-  demo <- gsub(" .csv",".csv",paste(demo,".csv"))
-  demo <- read.csv(demo,header=TRUE)
+  demo <- gsub(" .xlsx",".xlsx",paste(demo,".xlsx"))
+  demo <- read.xlsx(demo,sheetIndex=1)
 
-  print("Input the name of the med ranking table file you would like to use (leave off the .csv and the patient letters)")
+  print("Input the name of the med ranking table file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   ranking <- readline(prompt="Enter here: ")
   
-  ranking <- gsub(" .csv",".csv",paste(ranking,".csv"))
-  ranking <- read.csv(ranking,header=TRUE)
+  ranking <- gsub(" .xlsx",".xlsx",paste(ranking,".xlsx"))
+  ranking <- read.xlsx(ranking,sheetIndex=1)
   
   data <- data[!is.na(data[,1]),]
   anthro <- anthro[!is.na(anthro[,1]),]
@@ -633,11 +642,11 @@ load_calculation <- function() {
     med_load[med_load[,1]==i,10][1] <- length(med_load[med_load[,1]==i & med_load[,6]!=0,6])
   }
 
-  print("Give the name you would like to give to the file (leave off the .csv and the patient letters)")
-  csv <- readline(prompt="Enter here: ")
-  csv <- gsub(" .csv",".csv",paste(csv,".csv"))
-  csv <- gsub(" ","",paste(patient,"_",csv))
-  write.csv(med_load,file=csv,na="",row.names=FALSE)
+  print("Give the name you would like to give to the file (leave off the .xlsx and the patient letters)")
+  xlsx <- readline(prompt="Enter here: ")
+  xlsx <- gsub(" .xlsx",".xlsx",paste(xlsx,".xlsx"))
+  xlsx <- gsub(" ","",paste(patient,"_",xlsx))
+  write.xlsx(med_load,file=xlsx,showNA=FALSE,row.names=FALSE)
   
   if (!require("astsa")) {
     install.packages("astsa")

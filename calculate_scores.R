@@ -1,4 +1,4 @@
-calculate <- function(x,n,l,baseline,therapy,patient,string) {
+calculate <- function(x,n,l,baseline,therapy,patient,string,mrnumber) {
   # x,10,11,seizure.baseline,seizure.therapy,AlRo,"Seizure"
   # y,9,10,med.baseline,med.therapy,AlRo,"Med"
   
@@ -17,8 +17,8 @@ calculate <- function(x,n,l,baseline,therapy,patient,string) {
   c <- c(1:dim(therapy)[1])
   r <- c[c[]/30 > 0 & c[]/30 <= 1]
   free.30.days <- data.frame(therapy$date[min(r)],
-                                     therapy$date[max(r)],
-                                     (length(therapy.30.days[[1]][therapy.30.days[[1]]==0])/(length(therapy.30.days[[1]])))*100)
+                             therapy$date[max(r)],
+                             (length(therapy.30.days[[1]][therapy.30.days[[1]]==0])/(length(therapy.30.days[[1]])))*100)
   colnames(free.30.days)[1:2] <- c("First date","Last date")
   colnames(free.30.days)[3] <- paste("Percent",string,"Free Days")
   if (ceiling(dim(therapy)[1]/30) >= 2) {
@@ -48,16 +48,19 @@ calculate <- function(x,n,l,baseline,therapy,patient,string) {
   ## daily number response calculation
   daily.number.response <- c((therapy[,n]/base.number.median)*100)
   daily.number.response <- data.frame(daily.response,daily.number.response)
-  colnames(daily.number.response)[1] <- c("Date")
-  colnames(daily.number.response)[2] <- paste(string,"Response")
-  colnames(daily.number.response)[3] <- paste(string,"Number Response")
   print(paste("Daily",string,"number response calculated"))
   
-  print("Give the name you would like to give to the file (leave off the .csv and the patient letters)")
-  csv <- readline(prompt="Enter here: ")
-  csv <- gsub(" ","",paste(csv,".csv"))
-  csv <- gsub(" ","",paste(patient,"_",csv))
-  write.csv(daily.number.response,file=csv,na="",row.names=FALSE)
+  daily.number.response <- data.frame(rep(mrnumber,dim(daily.number.response)[1]),daily.number.response)
+  colnames(daily.number.response)[1] <- "MRNUMBER"
+  colnames(daily.number.response)[2] <- c("Date")
+  colnames(daily.number.response)[3] <- paste(string,"Response")
+  colnames(daily.number.response)[4] <- paste(string,"Number Response")
+  
+  print("Give the name you would like to give to the response file (leave off the .xlsx and the patient letters)")
+  xlsx <- readline(prompt="Enter here: ")
+  xlsx <- gsub(" ","",paste(xlsx,".xlsx"))
+  xlsx <- gsub(" ","",paste(patient,"_",xlsx))
+  write.xlsx(daily.number.response,file=xlsx,showNA=FALSE,row.names=FALSE)
   
   ## 30 day response calculation
   period.response <- c()
@@ -131,24 +134,32 @@ calculate <- function(x,n,l,baseline,therapy,patient,string) {
                               percent.free.response[,3],
                               overall.score[,3],
                               overall.number.score[,3]))
-  colnames(results)[1:2] <- c("First date","Last date")
-  colnames(results)[3] <- paste("%",string,"Free")
-  colnames(results)[4] <- paste(string,"Response")
-  colnames(results)[5] <- paste(string,"Number Response")
-  colnames(results)[6] <- paste("%",string,"Free Response")
-  colnames(results)[7] <- paste(string,"Score")
-  colnames(results)[8] <- paste(string,"Number Score")
-
-  print("Give the name you would like to give to the file (leave off the .csv and the patient letters)")
-  csv <- readline(prompt="Enter here: ")
-  csv <- gsub(" ","",paste(csv,".csv"))
-  csv <- gsub(" ","",paste(patient,"_",csv))
-  write.csv(results,file=csv,na="",row.names=FALSE)
+  
+  results <- data.frame(rep(mrnumber,dim(results)[1]),results)
+  colnames(results)[1] <- "MRNUMBER"
+  colnames(results)[2:3] <- c("First date","Last date")
+  colnames(results)[4] <- paste("%",string,"Free")
+  colnames(results)[5] <- paste(string,"Response")
+  colnames(results)[6] <- paste(string,"Number Response")
+  colnames(results)[7] <- paste("%",string,"Free Response")
+  colnames(results)[8] <- paste(string,"Score")
+  colnames(results)[9] <- paste(string,"Number Score")
+  
+  print("Give the name you would like to give to the score file (leave off the .xlsx and the patient letters)")
+  xlsx <- readline(prompt="Enter here: ")
+  xlsx <- gsub(" ","",paste(xlsx,".xlsx"))
+  xlsx <- gsub(" ","",paste(patient,"_",xlsx))
+  write.xlsx(results,file=xlsx,showNA=FALSE,row.names=FALSE)
   
   cat("Your results have been calculated",'\n','\n')
 }
 
 score_calculation <- function() {
+  
+  if (!require("xlsx")) {
+    install.packages("xlsx")
+  }
+  library(xlsx)
   
   print("Input the directory that you wish to draw this patient's data from")
   print("Example: C:/Folder_Name/")
@@ -159,42 +170,48 @@ score_calculation <- function() {
   print("Example: JoLe")
   patient <- readline(prompt="Enter here: ")
   
-  print("Input the name of the file in which the daily seizure loads can be found (leave off the .csv and the patient letters)")
+  print("Input the name of the file in which the daily seizure loads can be found (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   x <- readline(prompt="Enter here: ")
   
-  x <- gsub(" .csv",".csv",paste(x,".csv"))
+  x <- gsub(" .xlsx",".xlsx",paste(x,".xlsx"))
   x <- gsub(" ","",paste(patient,"_",x))
-  x <- read.csv(x,header=TRUE)
+  x <- read.xlsx(x,sheetIndex=1)
   x <- subset(x,!is.na(x[,11]))
-  ## Med number per day found in column 10 of this file
-  ## Med load per day found in column 11 of this file
+  ## Seizure number per day found in column 10 of this file
+  ## Seizure load per day found in column 11 of this file
   
   seizure.baseline <- subset(x,x$day.type==1)
   seizure.therapy <- subset(x,x$day.type!=1)
   
-  calculate(x,10,11,seizure.baseline,seizure.therapy,patient,"Seizure")
+  mrnumber <- unique(x[,1])
+  x <- x[,-1]
+  
+  calculate(x,10,11,seizure.baseline,seizure.therapy,patient,"Seizure",mrnumber)
+  
+  return(1)
   
   ###################################################################
   
-  print("Input the name of the file in which the daily med loads can be found (leave off the .csv)")
+  print("Input the name of the file in which the daily med loads can be found (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   y <- readline(prompt="Enter here: ")
   
-  y <- gsub(" .csv",".csv",paste(y,".csv"))
+  y <- gsub(" .xlsx",".xlsx",paste(y,".xlsx"))
   y <- gsub(" ","",paste(patient,"_",y))
-  y <- read.csv(y,header=TRUE)
+  y <- read.xlsx(y,sheetIndex=1)
   
-  print("Input the name of the med raw data file you would like to use (leave off the .csv and the patient letters)")
+  print("Input the name of the med raw data file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   data <- readline(prompt="Enter here: ")
   
-  data <- gsub(" .csv",".csv",paste(data,".csv"))
+  data <- gsub(" .xlsx",".xlsx",paste(data,".xlsx"))
   data <- gsub(" ","",paste(patient,"_",data))
-  data <- read.csv(data,header=TRUE)
+  data <- read.xlsx(data,sheetIndex=1)
   
   ## Med load per day found in column 9 of this file
   ## Med number per day found in column 10 of this file
+  y <- y[,-1]
   y <- subset(y,!is.na(y[,10]))
   y[,1] <- as.Date(y[,1],format="%m/%d/%Y")
   data <- subset(data,!is.na(data[,1]))
@@ -205,5 +222,7 @@ score_calculation <- function() {
   med.baseline <- y[y[,1]<therapy[1],]
   med.therapy <- y[y[,1]>=therapy[1],]
   
-  calculate(y,9,10,med.baseline,med.therapy,patient,"Med")
+  calculate(y,9,10,med.baseline,med.therapy,patient,"Med",mrnumber)
+  
+  
 }
