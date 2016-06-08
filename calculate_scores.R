@@ -156,6 +156,14 @@ calculate <- function(x,n,l,baseline,therapy,patient,string,mrnumber) {
 
 score_calculation <- function() {
   
+  if (!require("rJava")) {
+    install.packages("rJava")
+  }
+  library(rJava)
+  if (!require("xlsxjars")) {
+    install.packages("xlsxjars")
+  }
+  library(xlsxjars)
   if (!require("xlsx")) {
     install.packages("xlsx")
   }

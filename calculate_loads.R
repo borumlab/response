@@ -330,6 +330,14 @@ missing_sums <- function(x,y,q) {
 
 load_calculation <- function() {
   
+  if (!require("rJava")) {
+    install.packages("rJava")
+  }
+  library(rJava)
+  if (!require("xlsxjars")) {
+    install.packages("xlsxjars")
+  }
+  library(xlsxjars)
   if (!require("xlsx")) {
     install.packages("xlsx")
   }
@@ -418,7 +426,9 @@ load_calculation <- function() {
   data[,10] <- makelowercase(data[,10])
   
   values <- seizure_sum(data,ranks1,ranks2,ranks3,ranks4,ranks5)
-  values <- cbind(data[,3],values[,1:5],data[,9],values[,6])
+  values <- cbind(data[,3],values[,1:5],data[,9,drop=FALSE],values[,6])
+  
+  values[,7] <- as.numeric(paste(values[,7]))
   values[,8] <- (values[,7]*values[,8])
   colnames(values)[7:8] <- c("number","sum")
   
@@ -447,7 +457,7 @@ load_calculation <- function() {
         for (j in 1:(dim(values)[1]-i)) {
           if (values[(i+j),1] == values[i,1]) {
             k <- k + 1
-          } else if (values[(i+j),1] != values[i,9]) {
+          } else if (values[(i+j),1] != values[i,1]) {
             break
           }
         }
