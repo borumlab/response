@@ -1,4 +1,4 @@
-calculate <- function(x,n,l,baseline,therapy,patient,string,mrnumber) {
+calculate <- function(x,n,l,baseline,therapy,patient,string,mrnumber,type,quality,number) {
   # x,10,11,seizure.baseline,seizure.therapy,AlRo,"Seizure"
   # y,9,10,med.baseline,med.therapy,AlRo,"Med"
   
@@ -52,9 +52,18 @@ calculate <- function(x,n,l,baseline,therapy,patient,string,mrnumber) {
   
   daily.number.response <- data.frame(rep(mrnumber,dim(daily.number.response)[1]),daily.number.response)
   colnames(daily.number.response)[1] <- "MRNUMBER"
-  colnames(daily.number.response)[2] <- c("Date")
+  colnames(daily.number.response)[2] <- "Date"
   colnames(daily.number.response)[3] <- paste(string,"Response")
   colnames(daily.number.response)[4] <- paste(string,"Number Response")
+  
+  if (string == "Seizure") {
+    t <- data.frame(type)
+    q <- data.frame(quality)
+    sn <- data.frame(number[,1])
+    sl <- data.frame(number[,2])
+    daily.number.response <- data.frame(daily.number.response[,1:2],t,q,daily.number.response[,3:4],sn,sl)
+    colnames(daily.number.response)[c(3,4,7,8)] <- c("Day type","Seizure Quality","Seizure Number per Day","Seizure Load per Day")
+  }
   
   print("Give the name you would like to give to the response file (leave off the .xlsx and the patient letters)")
   xlsx <- readline(prompt="Enter here: ")
@@ -186,6 +195,14 @@ score_calculation <- function() {
   print("Example: FiLa")
   patient <- readline(prompt="Enter here: ")
   
+  print("Input the name of the file in which the seizure raw data can be found (leave off the .xlsx and the patient letters)")
+  print("Example: filename")
+  data <- readline(prompt="Enter here: ")
+  
+  data <- gsub(" .xlsx",".xlsx",paste(data,".xlsx"))
+  data <- gsub(" ","",paste(patient,"_",data))
+  data <- readWorksheetFromFile(data,sheet=1)
+  
   print("Input the name of the file in which the daily seizure loads can be found (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   x <- readline(prompt="Enter here: ")
@@ -201,9 +218,12 @@ score_calculation <- function() {
   seizure.therapy <- subset(x,x$day.type!=1)
   
   mrnumber <- unique(x[,1])
+  daytype <- cbind(unique(data[data[,2] %in% seizure.therapy[,2],c(2,3)])[,2])
+  seizurequality <- cbind(unique(data[data[,2] %in% seizure.therapy[,2],c(2,4)])[,2])
+  seizurenumber <- x[!is.na(x[,11]) & x[,2] %in% seizure.therapy[,2],11:12]
   x <- x[,-1]
   
-  calculate(x,10,11,seizure.baseline,seizure.therapy,patient,"Seizure",mrnumber)
+  calculate(x,10,11,seizure.baseline,seizure.therapy,patient,"Seizure",mrnumber,daytype,seizurequality,seizurenumber)
   
   return(1)
   
@@ -238,5 +258,5 @@ score_calculation <- function() {
   med.baseline <- y[y[,1]<therapy[1],]
   med.therapy <- y[y[,1]>=therapy[1],]
   
-  calculate(y,9,10,med.baseline,med.therapy,patient,"Med",mrnumber)
+  calculate(y,9,10,med.baseline,med.therapy,patient,"Med",mrnumber,NA,NA,NA)
 }
