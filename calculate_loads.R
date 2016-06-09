@@ -342,6 +342,14 @@ load_calculation <- function() {
     install.packages("xlsx")
   }
   library(xlsx)
+  if (!require("XLConnectJars")) {
+    install.packages("XLConnectJars")
+  }
+  library(XLConnectJars)
+  if (!require("XLConnect")) {
+    install.packages("XLConnect")
+  }
+  library(XLConnect)
   
   print("Input the directory that you wish to draw this patient's data from")
   print("Example: C:/Folder_Name/")
@@ -349,7 +357,7 @@ load_calculation <- function() {
   setwd(directory)
   
   print("Input the four letters that signify the patient we are doing calculations for")
-  print("Example: JoLe")
+  print("Example: FiLa")
   patient <- readline(prompt="Enter here: ")
   
   print("Input the name of the patient data file you would like to use (leave off the .xlsx and the patient letters)")
@@ -358,7 +366,7 @@ load_calculation <- function() {
   
   data <- gsub(" .xlsx",".xlsx",paste(data,".xlsx"))
   data <- gsub(" ","",paste(patient,"_",data))
-  data <- read.xlsx(data,sheetIndex=1)
+  data <- readWorksheetFromFile(data,sheet=1)
   
   print("Input the name of the ranking table file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
@@ -366,7 +374,7 @@ load_calculation <- function() {
   
   ranking <- gsub(" .xlsx",".xlsx",paste(ranking,".xlsx"))
   ranking <- gsub(" ","",paste(patient,"_",ranking))
-  ranking <- read.xlsx(ranking,sheetIndex=1)
+  ranking <- readWorksheetFromFile(ranking,sheet=1)
   
   mrnumber <- unique(data[,1])
   data <- data[!is.na(data[,1]),]
@@ -379,16 +387,7 @@ load_calculation <- function() {
   
   print("Calculating ranks. Please wait...")
   
-  q <- 0
-  for (i in 1:(dim(data)[1])) {
-    if (!is.na(data[i,1])) {
-      q <- q + 1
-    } else {
-      break
-    }
-  }
-  
-  data <- data[1:q,]
+  data <- data[!is.na(data[,1]),]
   
   n1 <- c(); n2 <- c(); n3 <- c(); n4 <- c(); n5 <- c()
   for (i in 1:(dim(ranking)[1])) {
@@ -436,7 +435,7 @@ load_calculation <- function() {
   colnames(values)[1] <- "date"
   
   print("Calculating sums for missing days. Please wait...")
-  
+
   values <- missing_sums(values,data[,4])
   colnames(values)[2] <- "day type"
   
@@ -474,12 +473,12 @@ load_calculation <- function() {
   seizure_load <- data.frame(cbind(rep(mrnumber,length(seizure.load.per.day))),values,seizure.number.per.day,seizure.load.per.day)
   colnames(seizure_load)[1] <- "MRNUMBER"
   colnames(seizure_load)[2] <- "date"
-
+  
   print("Give the name you would like to give to the file (leave off the .xlsx and the patient letters)")
   xlsx <- readline(prompt="Enter here: ")
   xlsx <- gsub(" .xlsx",".xlsx",paste(xlsx,".xlsx"))
   xlsx <- gsub(" ","",paste(patient,"_",xlsx))
-  write.xlsx(seizure_load,file=xlsx,showNA=FALSE,row.names=FALSE)
+  write.xlsx2(seizure_load,file=xlsx,showNA=FALSE,row.names=FALSE)
   
   return(1)
   
@@ -490,28 +489,28 @@ load_calculation <- function() {
   
   data <- gsub(" .xlsx",".xlsx",paste(data,".xlsx"))
   data <- gsub(" ","",paste(patient,"_",data))
-  data <- read.xlsx(data,sheetIndex=1)
-
+  data <- readWorksheetFromFile(data,sheet=1)
+  
   print("Input the name of the anthropometrics file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   anthro <- readline(prompt="Enter here: ")
   
   anthro <- gsub(" .xlsx",".xlsx",paste(anthro,".xlsx"))
-  anthro <- read.xlsx(anthro,sheetIndex=1)
+  anthro <- readWorksheetFromFile(anthro,sheet=1)
   
   print("Input the name of the demographics file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   demo <- readline(prompt="Enter here: ")
   
   demo <- gsub(" .xlsx",".xlsx",paste(demo,".xlsx"))
-  demo <- read.xlsx(demo,sheetIndex=1)
-
+  demo <- readWorksheetFromFile(demo,sheet=1)
+  
   print("Input the name of the med ranking table file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
   ranking <- readline(prompt="Enter here: ")
   
   ranking <- gsub(" .xlsx",".xlsx",paste(ranking,".xlsx"))
-  ranking <- read.xlsx(ranking,sheetIndex=1)
+  ranking <- readWorksheetFromFile(ranking,sheet=1)
   
   data <- data[!is.na(data[,1]),]
   anthro <- anthro[!is.na(anthro[,1]),]
@@ -524,17 +523,17 @@ load_calculation <- function() {
   mrnumber <- unique(anthro[,1])
   
   med_dose <- data[,c(2,5,9)]
-  med_dose[,1] <- gsub(" ","",med_dose[,1],fixed=TRUE)
-  med_dose[,1] <- as.Date(med_dose[,1],format="%m/%d/%Y")
+  #med_dose[,1] <- gsub(" ","",med_dose[,1],fixed=TRUE)
+  #med_dose[,1] <- as.Date(med_dose[,1],format="%m/%d/%Y")
   
   anthro <- anthro[,c(1,2,4,6,17)]
-  anthro[,2] <- gsub(" ","",anthro[,2],fixed=TRUE)
-  anthro[,2] <- as.Date(anthro[,2],format="%m/%d/%Y")
-  anthro[,5] <- gsub(" ","",anthro[,5],fixed=TRUE)
-  anthro[,5] <- as.Date(anthro[,5],format="%m/%d/%Y")
+  #anthro[,2] <- gsub(" ","",anthro[,2],fixed=TRUE)
+  #anthro[,2] <- as.Date(anthro[,2])
+  #anthro[,5] <- gsub(" ","",anthro[,5],fixed=TRUE)
+  #anthro[,5] <- as.Date(anthro[,5])
   
-  birthdate <- unique(anthro[,5])
-  last_date <- max(max(unique(anthro[,2])),max(unique(med_dose[,1])))-1
+  birthdate <- as.Date(unique(anthro[,5]))
+  last_date <- as.Date(max(max(unique(anthro[,2])),max(unique(med_dose[,1])))-1)
   
   ## Create table with start and end dates for each period of specific med usage and dosage
   END_DATE <- data.frame(rep(unique(med_dose[,1])[2]-1,length(med_dose[med_dose[,1]==unique(med_dose[,1])[2-1],2])))
@@ -651,12 +650,12 @@ load_calculation <- function() {
   for (i in unique(med_load[,1])) {
     med_load[med_load[,1]==i,10][1] <- length(med_load[med_load[,1]==i & med_load[,6]!=0,6])
   }
-
+  
   print("Give the name you would like to give to the file (leave off the .xlsx and the patient letters)")
   xlsx <- readline(prompt="Enter here: ")
   xlsx <- gsub(" .xlsx",".xlsx",paste(xlsx,".xlsx"))
   xlsx <- gsub(" ","",paste(patient,"_",xlsx))
-  write.xlsx(med_load,file=xlsx,showNA=FALSE,row.names=FALSE)
+  write.xlsx2(med_load,file=xlsx,showNA=FALSE,row.names=FALSE)
   
   if (!require("astsa")) {
     install.packages("astsa")

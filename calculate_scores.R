@@ -60,7 +60,7 @@ calculate <- function(x,n,l,baseline,therapy,patient,string,mrnumber) {
   xlsx <- readline(prompt="Enter here: ")
   xlsx <- gsub(" ","",paste(xlsx,".xlsx"))
   xlsx <- gsub(" ","",paste(patient,"_",xlsx))
-  write.xlsx(daily.number.response,file=xlsx,showNA=FALSE,row.names=FALSE)
+  write.xlsx2(daily.number.response,file=xlsx,showNA=FALSE,row.names=FALSE)
   
   ## 30 day response calculation
   period.response <- c()
@@ -149,7 +149,7 @@ calculate <- function(x,n,l,baseline,therapy,patient,string,mrnumber) {
   xlsx <- readline(prompt="Enter here: ")
   xlsx <- gsub(" ","",paste(xlsx,".xlsx"))
   xlsx <- gsub(" ","",paste(patient,"_",xlsx))
-  write.xlsx(results,file=xlsx,showNA=FALSE,row.names=FALSE)
+  write.xlsx2(results,file=xlsx,showNA=FALSE,row.names=FALSE)
   
   cat("Your results have been calculated",'\n','\n')
 }
@@ -160,6 +160,14 @@ score_calculation <- function() {
     install.packages("rJava")
   }
   library(rJava)
+  if (!require("XLConnectJars")) {
+    install.packages("XLConnectJars")
+  }
+  library(XLConnectJars)
+  if (!require("XLConnect")) {
+    install.packages("XLConnect")
+  }
+  library(XLConnect)
   if (!require("xlsxjars")) {
     install.packages("xlsxjars")
   }
@@ -175,7 +183,7 @@ score_calculation <- function() {
   setwd(directory)
   
   print("Input the four letters that signify the patient we are doing calculations for")
-  print("Example: JoLe")
+  print("Example: FiLa")
   patient <- readline(prompt="Enter here: ")
   
   print("Input the name of the file in which the daily seizure loads can be found (leave off the .xlsx and the patient letters)")
@@ -184,7 +192,7 @@ score_calculation <- function() {
   
   x <- gsub(" .xlsx",".xlsx",paste(x,".xlsx"))
   x <- gsub(" ","",paste(patient,"_",x))
-  x <- read.xlsx(x,sheetIndex=1)
+  x <- readWorksheetFromFile(x,sheet=1)
   x <- subset(x,!is.na(x[,11]))
   ## Seizure number per day found in column 10 of this file
   ## Seizure load per day found in column 11 of this file
@@ -207,7 +215,7 @@ score_calculation <- function() {
   
   y <- gsub(" .xlsx",".xlsx",paste(y,".xlsx"))
   y <- gsub(" ","",paste(patient,"_",y))
-  y <- read.xlsx(y,sheetIndex=1)
+  y <- readWorksheetFromFile(y,sheet=1)
   
   print("Input the name of the med raw data file you would like to use (leave off the .xlsx and the patient letters)")
   print("Example: filename")
@@ -215,7 +223,7 @@ score_calculation <- function() {
   
   data <- gsub(" .xlsx",".xlsx",paste(data,".xlsx"))
   data <- gsub(" ","",paste(patient,"_",data))
-  data <- read.xlsx(data,sheetIndex=1)
+  data <- readWorksheetFromFile(data,sheet=1)
   
   ## Med load per day found in column 9 of this file
   ## Med number per day found in column 10 of this file
@@ -231,6 +239,4 @@ score_calculation <- function() {
   med.therapy <- y[y[,1]>=therapy[1],]
   
   calculate(y,9,10,med.baseline,med.therapy,patient,"Med",mrnumber)
-  
-  
 }
