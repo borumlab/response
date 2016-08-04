@@ -21,7 +21,7 @@ Imports:
     tibble,
     gtable,
     scales,
-    rccp
+    Rcpp
 ImportFrom: lubridate interval,
     lubridate dyears,
     dplyr tbl_df
