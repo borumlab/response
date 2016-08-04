@@ -41,7 +41,8 @@ Imports:
     colorspace,
     plyr,
     lubridate,
-    stringr
+    stringr,
+    stringi
 ImportFrom: lubridate interval,
     lubridate dyears,
     dplyr tbl_df
