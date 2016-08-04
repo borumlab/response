@@ -15,12 +15,12 @@ Imports:
     RMySQL,
     DBI,
     ggplot2,
-    openxlsx,
     dplyr,
     readxl,
     assertthat,
     tibble,
-    gtable
+    gtable,
+    scales
 ImportFrom: lubridate interval,
     lubridate dyears,
     dplyr tbl_df
