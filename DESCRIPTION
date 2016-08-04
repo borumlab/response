@@ -39,7 +39,9 @@ Imports:
     Rcpp,
     munsell,
     colorspace,
-    plyr
+    plyr,
+    lubridate,
+    stringr
 ImportFrom: lubridate interval,
     lubridate dyears,
     dplyr tbl_df
