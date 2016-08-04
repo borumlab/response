@@ -20,7 +20,8 @@ Imports:
     assertthat,
     tibble,
     gtable,
-    scales
+    scales,
+    rccp
 ImportFrom: lubridate interval,
     lubridate dyears,
     dplyr tbl_df
