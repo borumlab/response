@@ -23,7 +23,8 @@ Imports:
     scales,
     Rcpp,
     munsell,
-    colorspace
+    colorspace,
+    plyr
 ImportFrom: lubridate interval,
     lubridate dyears,
     dplyr tbl_df
