@@ -22,7 +22,8 @@ Imports:
     gtable,
     scales,
     Rcpp,
-    munsell
+    munsell,
+    colorspace
 ImportFrom: lubridate interval,
     lubridate dyears,
     dplyr tbl_df
