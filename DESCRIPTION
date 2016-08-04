@@ -21,7 +21,8 @@ Imports:
     tibble,
     gtable,
     scales,
-    Rcpp
+    Rcpp,
+    munsell
 ImportFrom: lubridate interval,
     lubridate dyears,
     dplyr tbl_df
