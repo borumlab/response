@@ -1,6 +1,6 @@
 Package: clinicalresponse
 Title: Seizure and Epileptic Medication Response Package
-Version: 0.1.0
+Version: 0.1.1
 Date: 2016-08-04
 Authors@R: person("Jonathan", "Lee", email = "jonathanelee1993@gmail.com", role = c("aut", "cre"))
 Maintainer: Hannah Allen <hjallen@ufl.edu>
@@ -42,7 +42,8 @@ Imports:
     plyr,
     lubridate,
     stringr,
-    stringi
+    stringi,
+    labeling
 ImportFrom: lubridate interval,
     lubridate dyears,
     dplyr tbl_df
