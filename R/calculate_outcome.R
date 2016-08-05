@@ -178,8 +178,8 @@ calculate_outcome <- function() {
                                                                values=c("white","green","yellow","red"))
     seizure_bar_graph <- seizure_bar_graph + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5,siz=3))
     seizure_bar_graph <- seizure_bar_graph + labs(title=paste(gsub(" ","",paste(t,"'s")),"Seizure Response"),
-                                                  x="Time on Ketogenic Therapy",
-                                                  y="% of Time Period on Ketogenic Therapy")
+                                                  x="Time on Therapy",
+                                                  y="% of Time Period on Therapy")
     seizure_bar_graph <- seizure_bar_graph + theme(axis.title.y=element_text(angle=90,size=6))
     return(seizure_bar_graph)
   }
@@ -198,8 +198,8 @@ calculate_outcome <- function() {
                                                        values=c("white","green","yellow","red"))
     med_bar_graph <- med_bar_graph + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5,size=4))
     med_bar_graph <- med_bar_graph + labs(title=paste(gsub(" ","",paste(t,"'s")),"Med Response"),
-                                          x="Time on Ketogenic Therapy",
-                                          y="% of Time Period on Ketogenic Therapy")
+                                          x="Time on Therapy",
+                                          y="% of Time Period on Therapy")
     med_bar_graph <- med_bar_graph + theme(axis.title.y=element_text(angle=90,size=6))
     return(med_bar_graph)
   }
@@ -218,8 +218,8 @@ calculate_outcome <- function() {
                                                                values=c("green","yellow","white","red"))
     outcome_bar_graph <- outcome_bar_graph + theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5,size=4))
     outcome_bar_graph <- outcome_bar_graph + labs(title=paste(gsub(" ","",paste(t,"'s")),"Outcome Response"),
-                                                  x="Time on Ketogenic Therapy",
-                                                  y="% of Time Period on Ketogenic Therapy")
+                                                  x="Time on Therapy",
+                                                  y="% of Time Period on Therapy")
     outcome_bar_graph <- outcome_bar_graph + theme(axis.title.y=element_text(angle=90,size=6))
     return(outcome_bar_graph)
   }
