@@ -89,7 +89,7 @@ calculate_seizure_response <- function(patient,data,x,sourcedata,ranking) {
       base <- base + scale_x_date(limits=c(results$DATE[1],results$DATE[length(results$DATE)]),
                                   breaks=seq(results$DATE[1],results$DATE[length(results$DATE)],length.out=8),
                                   date_labels="%m/%d/%Y") 
-      base <- base + ggtitle(string) + xlab("Date on PKT") + ylab("Daily Seizure Response (%)")
+      base <- base + ggtitle(string) + xlab("Date on Therapy") + ylab("Daily Seizure Response (%)")
       base <- base + scale_y_continuous(limits=c(0,ceiling(max(results$SEIZURE_RESPONSE_DAY)/50)*50),
                                         breaks=seq(0,ceiling(max(results$SEIZURE_RESPONSE_DAY)/50)*50,
                                         length.out=ceiling(max(results$SEIZURE_RESPONSE_DAY)/50)+1))
