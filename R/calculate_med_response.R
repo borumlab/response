@@ -109,7 +109,7 @@ calculate_med_response <- function(patient,data,y,calculated,first,last) {
     base <- base + scale_x_date(limits=c(results$DATE[1],results$DATE[length(results$DATE)]),
                                 breaks=seq(results$DATE[1],results$DATE[length(results$DATE)],length.out=8),
                                 date_labels="%m/%d/%Y") 
-    base <- base + ggtitle(string) + xlab("Date on PKT") + ylab("Daily Med Response (%)")
+    base <- base + ggtitle(string) + xlab("Date on Therapy") + ylab("Daily Med Response (%)")
     base <- base + scale_y_continuous(limits=c(0,ceiling(max(results$MED_RESPONSE_DAY)/50)*50),
                                       breaks=seq(0,ceiling(max(results$MED_RESPONSE_DAY)/50)*50,
                                                  length.out=ceiling(max(results$MED_RESPONSE_DAY)/50)+1))
