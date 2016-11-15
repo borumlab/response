@@ -40,10 +40,11 @@ seizure_calculate <- function(x,n,l,baseline,therapy,patient,mrnumber,type,quali
 
   ## percent free days during therapy
   therapy.30.days <- split(therapy[,l],ceiling(seq_along(therapy[,l])/30))
+  therapy.7.days <- split(therapy[,l],ceiling(seq_along(therapy[,l])/7)) #Candice's edit
   c <- c(1:dim(therapy)[1])
   r <- c[c[]/30 > 0 & c[]/30 <= 1]
   free.30.days <- data.frame(therapy$DATE[min(r)],
-                             therapy$DATE[max(r)],
+                            therapy$DATE[max(r)],
                              (length(therapy.30.days[[1]][therapy.30.days[[1]]==0])/(length(therapy.30.days[[1]])))*100)
   colnames(free.30.days)[1:2] <- c("FIRST_DATE","LAST_DATE")
   colnames(free.30.days)[3] <- "%_SEIZURE_FREE_DAYS"
@@ -57,11 +58,12 @@ seizure_calculate <- function(x,n,l,baseline,therapy,patient,mrnumber,type,quali
       colnames(free.30.days) <- colnames(newrow)
     }
   }
-
+  
+  totalbaseline <- baseline #Candice's edit
   baseline <- subset(baseline,baseline[,l]!=0)
   base.median <- median(baseline[,l])
   base.number.median <- median(baseline[,n])
-
+  
   t <- data.frame(type)
   q <- data.frame(quality)
   q <- q[,-1]
@@ -71,13 +73,13 @@ seizure_calculate <- function(x,n,l,baseline,therapy,patient,mrnumber,type,quali
 
   if (free.base!=100) {
     ## daily response calculation
-    daily.response <- c((therapy[,l]/base.median)*100)
+    daily.response <- c((therapy[,l])/((sum(baseline$SEIZURE_LOAD_DAY)/length(baseline$SEIZURE_LOAD_DAY)))*100) #Candice's edit
     daily.response <- data.frame(therapy$DATE,daily.response)
     colnames(daily.response)[1] <- "DATE"
     colnames(daily.response)[2] <- "SEIZURE_RESPONSE"
 
     ## daily number response calculation
-    response <- c((therapy[,n]/base.number.median)*100)
+    response <- c(((therapy[,n]/((sum(baseline$SEIZURE_NUMBER_DAY)/length(baseline$SEIZURE_NUMBER_DAY)))))*100) #Candice's edit
     response <- data.frame(daily.response,response)
   }
   response <- data.frame(rep(mrnumber,dim(response)[1]),response)
@@ -109,9 +111,12 @@ seizure_calculate <- function(x,n,l,baseline,therapy,patient,mrnumber,type,quali
 
     colnames(period.response)[3] <- "SEIZURE_RESPONSE_30_DAYS"
 
+
+    
     ## 30 day number response calculation
     therapy.number.30.days <- split(therapy[,n],ceiling(seq_along(therapy[,n])/30))
-    period.number.response <- c()
+    therapy.number.7.days <- split(therapy[,n],ceiling(seq_along(therapy[,n])/7)) #Candice's edit
+   period.number.response <- c()
     for (i in 1:(ceiling(dim(therapy)[1]/30))) {
       period.number.median <- median(therapy.number.30.days[[i]][therapy.number.30.days[[i]]!=0])
       if (is.na(period.number.median) || period.number.median == 0) {
@@ -126,6 +131,7 @@ seizure_calculate <- function(x,n,l,baseline,therapy,patient,mrnumber,type,quali
     colnames(period.response)[4] <- "SEIZURE_NUMBER_RESPONSE"
   }
 
+
   ## percent free response
   percent.free.response <- period.response
   percent.free.response[,3] <- 100 - (free.30.days[,3] - free.base)
@@ -137,12 +143,19 @@ seizure_calculate <- function(x,n,l,baseline,therapy,patient,mrnumber,type,quali
   overall.number.score[,3] <- data.frame(rep(NA,dim(period.response)[1]))
   if (free.base!=100) {
     ## score
-    score.1 <- (((free.30.days[,3])/100) * ((percent.free.response[,3])/100)) * 100
-    score.2 <- (((100-free.30.days[,3])/100) * ((period.response[,3])/100)) * 100
+   score.1 <- (((free.30.days[,3])/100) * ((percent.free.response[,3])/100)) * 100
+   score.2 <- (((100-free.30.days[,3])/100) * ((period.response[,3])/100)) * 100
     score <- score.1 + score.2
     overall.score <- percent.free.response
     overall.score[,3] <- score
     colnames(overall.score)[3] <- "SEIZURE_SCORE_30_DAYS"
+    
+    #Candice's edit#
+    y2 <- (sum(totalbaseline$SEIZURE_LOAD_DAY)/length(totalbaseline$SEIZURE_LOAD_DAY))*30
+    SEIZURE_SCORE_7_DAYS1 <- as.numeric(lapply(therapy.30.days, function(x) (((sum(x)/30)*30)/y2)*100))
+    ###
+    
+    
 
     ## number score
     score.3 <- (((free.30.days[,3])/100) * ((percent.free.response[,3])/100)) * 100
@@ -152,7 +165,12 @@ seizure_calculate <- function(x,n,l,baseline,therapy,patient,mrnumber,type,quali
     overall.number.score[,3] <- score2
     colnames(overall.number.score)[3] <- "SEIZURE_NUMBER_SCORE"
   }
-
+  
+  #Candice's edit#
+  y2 <- (sum(totalbaseline$SEIZURE_NUMBER_DAY)/length(totalbaseline$SEIZURE_NUMBER_DAY))*30
+  SEIZURE_NUMBER_SCORE_7_DAYS1 <- as.numeric(lapply(therapy.number.30.days, function(x) (((sum(x)/30)*30)/y2)*100))
+  ###
+  
   results <- data.frame(overall.score[,1],
                         overall.score[,2],
                         cbind(free.30.days[,3],
@@ -166,11 +184,11 @@ seizure_calculate <- function(x,n,l,baseline,therapy,patient,mrnumber,type,quali
   colnames(results)[1] <- "MRNUMBER"
   colnames(results)[2:3] <- c("FIRST_DATE","LAST_DATE")
   colnames(results)[4] <- "%_SEIZURE_FREE"
-  colnames(results)[5] <- "SEIZURE_RESPONSE"
-  colnames(results)[6] <- "SEIZURE_NUMBER_RESPONSE"
+  colnames(results)[5] <- "SEIZURE_RESPONSE" #this
+  colnames(results)[6] <- "SEIZURE_NUMBER_RESPONSE" #this
   colnames(results)[7] <- "% SEIZURE_FREE_RESPONSE"
-  colnames(results)[8] <- "SEIZURE_SCORE"
-  colnames(results)[9] <- "SEIZURE_NUMBER_SCORE"
+  colnames(results)[8] <- "SEIZURE_SCORE" #this
+  colnames(results)[9] <- "SEIZURE_NUMBER_SCORE" #this
 
   na <- rep(NA,dim(response)[1])
   outcome <- data.frame(response,a=na,b=na,c=na,d=na)
@@ -180,6 +198,22 @@ seizure_calculate <- function(x,n,l,baseline,therapy,patient,mrnumber,type,quali
   colnames(outcome)[12] <- "SEIZURE_SCORE_30_DAYS"
 
   outcome[outcome$DATE %in% results$LAST_DATE,c(9:12)] <- results[,c(4,5,7,8)]
+  
+  #Candice's edit##
+  outcome$`%_SEIZURE_FREE_30_DAYS` <- NULL #removing columns that are no longer needed
+  outcome$SEIZURE_RESPONSE_30_DAYS <- NULL
+  outcome$`%_SEIZURE_FREE_RESPONSE_30_DAYS` <- NULL
+  outcome$SEIZURE_SCORE_30_DAYS <- NULL
+  SEIZURE_SCORE_30_DAYS <- rep(NA, dim(outcome)[1]) #empty set
+  options(warn=-1)
+  SEIZURE_SCORE_30_DAYS[seq(30,dim(outcome)[1],30)] <- SEIZURE_SCORE_7_DAYS1
+  SEIZURE_SCORE_30_DAYS[dim(outcome)[1]] <- SEIZURE_SCORE_7_DAYS1[length(SEIZURE_SCORE_7_DAYS1)]
+  SEIZURE_NUMBER_SCORE_30_DAYS <- rep(NA, dim(outcome)[1]) #empty set
+  options(warn=-1)
+  SEIZURE_NUMBER_SCORE_30_DAYS[seq(30,dim(outcome)[1],30)] <- SEIZURE_NUMBER_SCORE_7_DAYS1
+  SEIZURE_NUMBER_SCORE_30_DAYS[dim(outcome)[1]] <- SEIZURE_NUMBER_SCORE_7_DAYS1[length(SEIZURE_NUMBER_SCORE_7_DAYS1)]
+  outcome <- data.frame(outcome,SEIZURE_SCORE_30_DAYS, SEIZURE_NUMBER_SCORE_30_DAYS)
+  ###
 
   return(outcome)
 }
