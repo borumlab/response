@@ -30,4 +30,3 @@ then assign NA values to that row for now, to be dealt with later.
 }
 \keyword{range}
 \keyword{rank}
-

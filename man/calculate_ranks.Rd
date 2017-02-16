@@ -20,4 +20,3 @@ increasing numerical order based on ranking value
 }
 \keyword{calculate}
 \keyword{rank}
-

@@ -79,7 +79,7 @@ calculate_med_response <- function(patient,data,y,calculated,first,last) {
         results[results$DATE==i,c("COMMENTS")] <- data[data$DATE==i,c("COMMENTS")][1]
       }
     }
-    print("Responses and scores have been calculated")
+    print("Scores have been calculated")
   } else {
     print("Baseline is zero, no med response values can be calculated")
   }
@@ -101,59 +101,79 @@ calculate_med_response <- function(patient,data,y,calculated,first,last) {
     }
     
     results$DATE <- as.Date(results$DATE)
-    string <- paste(first,gsub(" ","",paste(last,":")),"Daily Med Response")
+    string <- paste(first,gsub(" ","",paste(last,":")),"Med Score per Day")
     len <- ceiling((results$DATE[length(results$DATE)] - results$DATE[1])/4)
-    base <- ggplot(results,aes(results$DATE,MED_RESPONSE_DAY)) 
-    base <- base + geom_hline(yintercept=100) 
+    base <- ggplot(results,aes(results$DATE,MED_RESPONSE_DAY))
+    base <- base + geom_hline(yintercept=100)
     base <- base + geom_point(aes(colour=factor(results$DAY_TYPE)),size=0.5) + geom_line(aes(DATE,MED_RESPONSE_DAY,colour=factor(results$DAY_TYPE)),size=0.1)
     base <- base + scale_x_date(limits=c(results$DATE[1],results$DATE[length(results$DATE)]),
                                 breaks=seq(results$DATE[1],results$DATE[length(results$DATE)],length.out=8),
-                                date_labels="%m/%d/%Y") 
-    base <- base + ggtitle(string) + xlab("Date on Therapy") + ylab("Daily Med Response (%)")
+                                date_labels="%m/%d/%y")
+    base <- base + ggtitle(string) + xlab("Date") + ylab("Med Score (%)")
     base <- base + scale_y_continuous(limits=c(0,ceiling(max(results$MED_RESPONSE_DAY)/50)*50),
                                       breaks=seq(0,ceiling(max(results$MED_RESPONSE_DAY)/50)*50,
                                                  length.out=ceiling(max(results$MED_RESPONSE_DAY)/50)+1))
     base <- base + theme(panel.border=element_blank(),panel.grid.major=element_blank(),panel.grid.minor=element_blank())
     base <- base + theme(axis.line.x=element_line(size=0.5,colour="black"),axis.line.y=element_line(size=0.5,colour="black"))
     base <- base + theme(axis.text.x=element_text(size=5))
-    base <- base + scale_color_manual(name="",labels=c("Daily Med Response"),values=c("brown"))
-    file <- gsub(" ","",paste(patient,"_MED_DAILY_GRAPH.jpeg"))
+    base <- base + scale_color_manual(name="",labels=c("Med Score per Day"),values=c("brown"))
+    base <- base + theme_bw() +
+      theme(axis.text.x = element_text(size=11, colour = "black"),
+            axis.text.y = element_text(size=11, colour= "black"),
+            axis.title.y = element_text(size=12),
+            plot.title=element_text(size=12, hjust=0.5),
+            legend.position="bottom",
+            legend.background=element_rect(fill="white", colour="black"),
+            legend.text=element_text(size=11),
+            legend.key.width=unit(2, "line"),
+            title = element_text(size=12))
+    file <- gsub(" ","",paste(patient,"_MED_DAILY_GRAPH.png"))
     ggsave(base,filename=file,width=6,height=4)
-    print(paste(gsub(" ","",paste(patient,"_MED_DAILY_GRAPH.jpeg")),"created and saved"))
+    print(paste(gsub(" ","",paste(patient,"_MED_DAILY_GRAPH.png")),"created and saved"))
     
-    temp <- results[!(is.na(results$MED_SCORE_30_DAYS)),]
+    temp <- results[!(is.na(results$MED_SCORE_30)),]
     temp$DAY_TYPE <- "2"
     temp$DAY_TYPE <- factor(temp$DAY_TYPE,levels=c("2"))
-    if (length(results$MED_SCORE_30_DAYS)>0) {
-      string <- paste("Med Score per 30 days:",first,last)
-      plotscore <- ggplot(temp,aes(x=DATE,y=MED_SCORE_30_DAYS,colour=DAY_TYPE,fill=DAY_TYPE))
+    if (length(results$MED_SCORE_30)>0) {
+      string <- paste(first,gsub(" ","",paste(last,":")),"Med Score per 30 Days")
+      plotscore <- ggplot(temp,aes(x=DATE,y=MED_SCORE_30,colour=DAY_TYPE,fill=DAY_TYPE))
       plotscore <- plotscore + geom_hline(yintercept=100)
-      plotscore <- plotscore + geom_line(aes(DATE,MED_SCORE_30_DAYS,colour=factor(temp$DAY_TYPE)))
+      plotscore <- plotscore + geom_line(aes(DATE,MED_SCORE_30,colour=factor(temp$DAY_TYPE)))
       plotscore <- plotscore + geom_point(aes(colour=factor(temp$DAY_TYPE),fill=factor(temp$DAY_TYPE)),shape=24)
-      plotscore <- plotscore + xlab("Date on Therapy") + ylab("Score (%)") + ggtitle(string)
+      plotscore <- plotscore + xlab("Date") + ylab("Med Score (%)") + ggtitle(string)
       plotscore <- plotscore + theme(axis.title=element_text(angle=0,size=10))
-      plotscore <- plotscore + theme(plot.title=element_text(angle=0,size=10))
+      plotscore <- plotscore + theme(plot.title=element_text(angle=0,size=10, hjust = 0.5))
       plotscore <- plotscore + theme(legend.title=element_text(size=14,face="bold"))
-      plotscore <- plotscore + scale_fill_manual(name="",labels=c("Med Score"),values=c("black"))
-      plotscore <- plotscore + scale_color_manual(name="",labels=c("Med Score"),values=c("red"))
+      plotscore <- plotscore + scale_fill_manual(name="",labels=c("Med Score per 30 Days"),values=c("black"))
+      plotscore <- plotscore + scale_color_manual(name="",labels=c("Med Score per 30 Days"),values=c("red"))
       plotscore <- plotscore + theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
       plotscore <- plotscore + theme(panel.border=element_rect(colour="black",fill=NA,size=1.5))
-      plotscore <- plotscore + theme(axis.text.x=element_text(size=6))
-      plotscore <- plotscore + scale_x_date(limits=c(temp$DATE[1],temp$DATE[length(temp$DATE)]), 
+      plotscore <- plotscore + theme(axis.text.x=element_text(size=6, colour = "black"))
+      plotscore <- plotscore + scale_x_date(limits=c(temp$DATE[1],temp$DATE[length(temp$DATE)]),
                                             breaks=seq(temp$DATE[1],temp$DATE[length(temp$DATE)],length.out=8),
-                                            date_labels="%m/%d/%Y")
-      plotscore <- plotscore + scale_y_continuous(limits=c(0,ceiling(max(temp$MED_SCORE_30_DAYS)/50)*50),
-                                                  breaks=seq(0,ceiling(max(temp$MED_SCORE_30_DAYS)/50)*50,
-                                                             length.out=ceiling(max(temp$MED_SCORE_30_DAYS)/50)+1))
-      file <- gsub(" ","",paste(patient,"_MED_SCORE_GRAPH.jpeg"))
+                                            date_labels="%m/%d/%y")
+      plotscore <- plotscore + scale_y_continuous(limits=c(0,ceiling(max(temp$MED_SCORE_30)/50)*50),
+                                                  breaks=seq(0,ceiling(max(temp$MED_SCORE_30)/50)*50,
+                                                             length.out=ceiling(max(temp$MED_SCORE_30)/50)+1))
+      plotscore <- plotscore + theme_bw() +
+        theme(axis.text.x = element_text(size=11, colour= "black"),
+              axis.text.y = element_text(size=11, colour = "black"),
+              plot.title=element_text(size=12, hjust=0.5),
+              axis.title.y = element_text(size=12),
+              legend.position="bottom",
+              legend.background=element_rect(fill="white", colour="black"),
+              legend.text=element_text(size=11),
+              legend.key.width=unit(2, "line"),
+              title = element_text(size=12))
+      file <- gsub(" ","",paste(patient,"_MED_SCORE_GRAPH.png"))
       ggsave(plotscore,filename=file,width=6,height=4)
       
-      print(paste(gsub(" ","",paste(patient,"_MED_SCORE_GRAPH.jpeg")),"created and saved"))
+      print(paste(gsub(" ","",paste(patient,"_MED_SCORE_GRAPH.png")),"created and saved"))
     }
   } else {
     results <- data.frame(med.therapy[,colnames(med.therapy) %in% c("MRNUMBER","DATE","DAY_TYPE","MED_LOAD_DAY","MED_NUMBER_DAY")])
-    results <- cbind.data.frame(results,MED_RESPONSE_DAY=NA,MED_NUMBER_RESPONSE_DAY=NA,'%_MED_FREE_30_DAYS'=NA,
-                                MED_RESPONSE_30_DAYS=NA,'%_MED_FREE_RESPONSE_30_DAYS'=NA,MED_SCORE_30_DAYS=NA)
+    results <- cbind.data.frame(results,MED_RESPONSE_DAY=NA,MED_NUMBER_RESPONSE_DAY=NA,'%_MED_FREE_30'=NA,
+                                MED_RESPONSE_30=NA,'%_MED_FREE_RESPONSE_30'=NA,MED_SCORE_30=NA)
   }
   
   print("Type 'yes' if you wish to save this patient's MED_DATA_CLINICAL file in the same folder as this patient's MED_LOAD file. Type 'no' if you would like for it to be in a different folder")
@@ -167,7 +187,7 @@ calculate_med_response <- function(patient,data,y,calculated,first,last) {
     directory <- readline(prompt="Enter here: ")
     setwd(directory)
   }
-  
+  results <- data.frame(results[,1:7], results[,11:12])
   print(paste("Saving med clinical outcome table as",gsub(" ","",paste(patient,"_MED_DATA_CLINICAL.xlsx")),"in directory",getwd()))
   xlsx <- "MED_DATA_CLINICAL.xlsx"
   xlsx <- gsub(" ","",paste(patient,"_",xlsx))

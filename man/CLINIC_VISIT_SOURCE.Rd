@@ -14,4 +14,3 @@ Clinic Visit Source
 \keyword{clinic}
 \keyword{source}
 \keyword{visit}
-

@@ -23,4 +23,3 @@ You can upload this data to a MySQL database if you choose.
 }
 \keyword{response}
 \keyword{seizure}
-

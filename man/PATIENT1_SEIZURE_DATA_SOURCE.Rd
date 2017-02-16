@@ -14,4 +14,3 @@ PATIENT1 Seizure Data Source
 \keyword{data}
 \keyword{seizure}
 \keyword{source}
-

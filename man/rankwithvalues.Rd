@@ -21,4 +21,3 @@ i.e. variable, type, and severity)
 }
 \keyword{rank}
 \keyword{value}
-

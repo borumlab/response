@@ -1,5 +1,5 @@
 Package: clinicalresponse
-Title: Seizure and Epileptic Medication Response Package
+Title: Seizure and Anti-Epileptic Medication Score Package
 Version: 0.1.1
 Date: 2016-08-04
 Authors@R: person("Jonathan", "Lee", email = "jonathanelee1993@gmail.com", role = c("aut", "cre"))
@@ -27,7 +27,6 @@ Imports:
     assertthat,
     utils,
     R6,
-    Rcpp,
     tibble,
     magrittr,
     lazyeval,
@@ -47,4 +46,4 @@ Imports:
 ImportFrom: lubridate interval,
     lubridate dyears,
     dplyr tbl_df
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

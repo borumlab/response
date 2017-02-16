@@ -21,4 +21,3 @@ are observed in ranges, i.e. length and cluster)
 }
 \keyword{range}
 \keyword{rank}
-

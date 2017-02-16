@@ -18,7 +18,8 @@
 #           When the script finishes calculating daily seizure loads, you will be asked if you wish to save
 #           a FILA_SEIZURE_LOAD file into the work directory for your viewing
 calculate_seizure_load <- function() {
-
+library(rJava)
+  
   # Input patient identifier
   print("Input the identifier that signify the patient we are doing calculations for")
   print("Example: FILA")

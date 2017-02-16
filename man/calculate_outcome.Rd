@@ -15,4 +15,3 @@ med score, and outcome for each period of 30 days)
 calculate_outcome()
 }
 \keyword{outcome}
-

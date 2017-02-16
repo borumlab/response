@@ -14,4 +14,3 @@ PATIENT1 Seizure Ranking Source
 \keyword{ranking}
 \keyword{seizure}
 \keyword{source}
-

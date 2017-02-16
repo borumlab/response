@@ -25,4 +25,3 @@ You can upload this data to a MySQL database if you choose.
 }
 \keyword{med}
 \keyword{response}
-

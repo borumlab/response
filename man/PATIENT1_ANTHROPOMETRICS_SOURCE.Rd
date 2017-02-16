@@ -13,4 +13,3 @@ PATIENT1 Anthropometrics Source
 }
 \keyword{anthropometrics}
 \keyword{source}
-

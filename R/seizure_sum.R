@@ -36,7 +36,7 @@ seizure_sum <- function(x,a,b,c,d,e) {
       ranktable[i,1] <- rankwithvalues(x$SEIZURE_SEVERITY[i],a[,c(1,2)])
       ranktable[i,2] <- rankwithranges(x$SEIZURE_LENGTH[i],b[,c(1,2)])
       ranktable[i,3] <- rankwithvalues(x$SEIZURE_TYPE[i],c[,c(1,2)])
-      ranktable[i,4] <- rankwithvalues(x$SEIZURE_VARIABLES[i],d[,c(1,2)])
+      ranktable[i,4] <- rankwithvalues(x$SEIZURE_VARIABLE[i],d[,c(1,2)])
       ranktable[i,5] <- rankwithranges(x$SEIZURE_CLUSTER[i],e[,c(1,2)])
       for (j in 1:5) {
         seizureloadvalues[i] <- seizureloadvalues[i] + ranktable[i,j]

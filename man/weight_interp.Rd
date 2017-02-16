@@ -18,4 +18,3 @@ on non-clinic days, based on linear interpolation
 }
 \keyword{interpolation}
 \keyword{weight}
-

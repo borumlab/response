@@ -39,4 +39,3 @@ and seizure number score
 }
 \keyword{response}
 \keyword{seizure}
-

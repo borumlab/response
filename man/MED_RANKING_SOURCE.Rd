@@ -14,4 +14,3 @@ Med Ranking Source
 \keyword{med}
 \keyword{ranking}
 \keyword{source}
-

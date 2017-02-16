@@ -17,4 +17,3 @@ This function ensure that all alphabetic data in the raw seizure data table is l
 }
 \keyword{lowercase}
 \keyword{make}
-

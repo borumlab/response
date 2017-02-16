@@ -14,4 +14,3 @@ calculate_seizure_load()
 }
 \keyword{load}
 \keyword{seizure}
-

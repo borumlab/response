@@ -270,6 +270,69 @@ calculate_med_load <- function() {
     }
   }
 
+  ##############
+  
+  medload2 <- med_load #For Med_Load Graph
+  medload2 <- subset(medload2, DAY_TYPE==1 | DAY_TYPE==2) #subsetting the data frame to only include rows of day type 1 and 2
+  #Creating dataframe called 'total' that will be used to graph the Total Med Load
+  DATE <- medload2$DATE
+  MED_LOAD_DAY <- medload2$MED_LOAD_DAY
+  total <- data.frame(DATE, MED_LOAD_DAY)
+  total <- na.omit(total) #removing rows with NAs
+  
+  #Defining the axes
+  #for x-axis
+  datebreaks <- seq.Date(min(DATE), max(DATE), length.out=8)
+  
+  #for y-axis
+  z1 <- floor(min(medload2$MED_LOAD_MED))
+  z2 <- ceiling(max(total$MED_LOAD_DAY))
+  
+  #matching med_id with med_generic_name for med_load graph
+  z <- unique(medload2$MED_ID) #provides a list of the different meds the patient is on
+  #the for loop below matches the med_id in the med_load sheet with the med_generic_name from the ranking sheet
+  for (i in 1:length(z)) {
+    medload2$MED_ID[medload2$MED_ID==z[i]] <- ranking$MED_GENERIC_NAME[which(ranking$MED_ID == z[i])[1]]
+  }
+  
+  #Defining the line colors, might need to add more if an error comes up
+  cbbPalette <- c("orange", "green3", "purple", "red", "blue", "brown", "lightseagreen", "violetred4")
+  string <- paste(first,gsub(" ","",paste(last,":")),"Medication Load per Day") #For Graph Title
+  
+  
+  medloadgraph <- 
+    
+    ggplot() +
+    geom_line(aes(x=total$DATE, y=total$MED_LOAD_DAY, linetype="Total"), color="black", size=1.5) +
+    geom_line(aes(group=medload2$MED_ID, x=medload2$DATE, y=medload2$MED_LOAD_MED, color=medload2$MED_ID), size=1.5) +
+    geom_point(aes(group=medload2$MED_ID, x=medload2$DATE, y=medload2$MED_LOAD_MED, shape = medload2$MED_ID, color=medload2$MED_ID),  fill="white",size=2) +
+    geom_point(aes(x=total$DATE, y=total$MED_LOAD_DAY), shape=16, color="black", show.legend=F, size=2) +
+    xlab("Date") +
+    ylab("Medication Load") +
+    ggtitle(string) +
+    geom_hline(yintercept = seq(z1,z2,by=2)) +
+    scale_x_date(breaks=datebreaks, date_labels="%m/%d/%y") +
+    scale_y_continuous(breaks=seq(z1, z2, by=2)) +
+    theme_bw() +
+    theme(axis.text.x = element_text(size=11, colour="black"),
+          axis.title.x = element_text(size=12),
+          axis.text.y= element_text(size=11, colour="black"),
+          axis.title.y = element_text(size=12),
+          plot.title=element_text(size=12, hjust=0.5),
+          legend.position = "bottom",
+          legend.text=element_text(size=10)) +
+    scale_colour_manual(name= "", values=cbbPalette) +
+    scale_linetype(name="") +
+    scale_shape_manual(name="", values=c(21,22,23,24,25,15,16,17,18,12))
+  
+  
+  file <- gsub(" ","",paste(patient,"_MED_LOAD_GRAPH.png"))
+  ggsave(medloadgraph,file=file,width=6,height=4, units='in', dpi=600)
+  print(paste(gsub(" ","",paste(patient,"_MED_LOAD_GRAPH.png")),"created and saved in the patient folder"))
+  
+  #############
+  
+  
   observe_load <- FALSE
   print("Would you like to save a temporary file to look at the med loads?")
   print("Type 'YES' to save a file to look at, type 'NO' to move onto next step")

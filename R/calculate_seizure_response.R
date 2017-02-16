@@ -44,7 +44,7 @@ calculate_seizure_response <- function(patient,data,x,sourcedata,ranking) {
         results[results$DATE==i,c("COMMENTS")] <- data[data$DATE==i,c("COMMENTS")][1]
       }
     }
-    print("Response and scores have been calculated")
+    print("Scores have been calculated")
     
     # If there is a baseline day with seizure load greater than 0, create a graph of the daily seizure responses
     # and then save this graph in the patient folder
@@ -81,55 +81,77 @@ calculate_seizure_response <- function(patient,data,x,sourcedata,ranking) {
       }
       
       results$DATE <- as.Date(results$DATE)
-      string <- paste(first,gsub(" ","",paste(last,":")),"Daily Seizure Response")
+      string <- paste(first,gsub(" ","",paste(last,":")),"Seizure Score per Day")
       len <- ceiling((results$DATE[length(results$DATE)] - results$DATE[1])/4)
       base <- ggplot(results,aes(x=results$DATE,y=results$SEIZURE_RESPONSE_DAY)) 
       base <- base + geom_hline(yintercept=100)
       base <- base + geom_point(aes(colour=factor(results$DAY_TYPE)),size=0.5) + geom_line(aes(DATE,SEIZURE_RESPONSE_DAY,colour=factor(results$DAY_TYPE)),size=0.1)
       base <- base + scale_x_date(limits=c(results$DATE[1],results$DATE[length(results$DATE)]),
                                   breaks=seq(results$DATE[1],results$DATE[length(results$DATE)],length.out=8),
-                                  date_labels="%m/%d/%Y") 
-      base <- base + ggtitle(string) + xlab("Date on Therapy") + ylab("Daily Seizure Response (%)")
+                                  date_labels="%m/%d/%y") 
+      base <- base + ggtitle(string) + xlab("Date on Therapy") + ylab("Seizure Score (%)")
       base <- base + scale_y_continuous(limits=c(0,ceiling(max(results$SEIZURE_RESPONSE_DAY)/50)*50),
                                         breaks=seq(0,ceiling(max(results$SEIZURE_RESPONSE_DAY)/50)*50,
-                                        length.out=ceiling(max(results$SEIZURE_RESPONSE_DAY)/50)+1))
+                                                   length.out=ceiling(max(results$SEIZURE_RESPONSE_DAY)/50)+1))
       base <- base + theme(panel.border=element_blank(),panel.grid.major=element_blank(),panel.grid.minor=element_blank())
       base <- base + theme(axis.line.x=element_line(size=0.5,colour="black"),axis.line.y=element_line(size=0.5,colour="black"))
-      base <- base + theme(axis.text.x=element_text(size=5))
-      base <- base + scale_color_manual(name="",labels=c("Daily Seizure Response"),values=c("brown"))
-      file <- gsub(" ","",paste(patient,"_SEIZURE_DAILY_GRAPH.jpeg"))
+      #base <- base + theme(axis.text.x=element_text(size=3))
+      base <- base + scale_color_manual(name="",labels=c("Seizure Score per Day"),values=c("brown"))
+      base <- base + theme_bw() +
+        theme(axis.text.y = element_text(size=11, colour = "black"),
+              axis.title.y = element_text(size=12),
+              plot.title=element_text(size=12, hjust=0.5),
+              legend.position="bottom",
+              legend.background=element_rect(fill="white", colour="black"),
+              legend.text=element_text(size=11),
+              legend.key.width=unit(2, "line"),
+              title = element_text(size=12))
+      base <- base + theme(axis.text.x=element_text(size=11, colour = "black"))
+      file <- gsub(" ","",paste(patient,"_SEIZURE_DAILY_GRAPH.png"))
       ggsave(base,filename=file,width=6,height=4)
       
-      print(paste(gsub(" ","",paste(patient,"_SEIZURE_DAILY_GRAPH.jpeg")),"created and saved"))
+      print(paste(gsub(" ","",paste(patient,"_SEIZURE_DAILY_GRAPH.png")),"created and saved"))
       
-      temp <- results[!(is.na(results$SEIZURE_SCORE_30_DAYS)),]
+      temp <- results[!(is.na(results$SEIZURE_SCORE_30)),]
       temp$DAY_TYPE <- "2"
       temp$DAY_TYPE <- factor(temp$DAY_TYPE,levels=c("2"))
-      if (length(results$SEIZURE_SCORE_30_DAYS)>0) {
-        string <- paste("Seizure Score per 30 days:",first,last)
-        plotscore <- ggplot(temp,aes(x=temp$DATE,y=temp$SEIZURE_SCORE_30_DAYS))
+      if (length(results$SEIZURE_SCORE_30)>0) {
+        string <-paste(first,gsub(" ","",paste(last,":")),"Seizure Score per 30 Days")
+        plotscore <- ggplot(temp,aes(x=temp$DATE,y=temp$SEIZURE_SCORE_30))
         plotscore <- plotscore + geom_hline(yintercept=100)
-        plotscore <- plotscore + geom_line(aes(DATE,SEIZURE_SCORE_30_DAYS,colour=factor(temp$DAY_TYPE)))
+        plotscore <- plotscore + geom_line(aes(DATE,SEIZURE_SCORE_30,colour=factor(temp$DAY_TYPE)))
         plotscore <- plotscore + geom_point(aes(colour=factor(temp$DAY_TYPE),fill=factor(temp$DAY_TYPE)),shape=24)
-        plotscore <- plotscore + xlab("Date on Therapy") + ylab("Score (%)") + ggtitle(string)
+        plotscore <- plotscore + xlab("Date on Therapy") + ylab("Seizure Score (%)") + ggtitle(string)
         plotscore <- plotscore + theme(axis.title=element_text(angle=0,size=10))
         plotscore <- plotscore + theme(plot.title=element_text(angle=0,size=10))
         plotscore <- plotscore + theme(legend.title=element_text(size=14,face="bold"))
-        plotscore <- plotscore + scale_fill_manual(name="",labels=c("Seizure Score"),values=c("black"))
-        plotscore <- plotscore + scale_color_manual(name="",labels=c("Seizure Score"),values=c("blue"))
+        plotscore <- plotscore + scale_fill_manual(name="",labels=c("Seizure Score per 30 Days"),values=c("black"))
+        plotscore <- plotscore + scale_color_manual(name="",labels=c("Seizure Score per 30 Days"),values=c("blue"))
         plotscore <- plotscore + theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
         plotscore <- plotscore + theme(panel.border=element_rect(colour="black",fill=NA,size=1.5))
-        plotscore <- plotscore + theme(axis.text.x=element_text(size=6))
+        plotscore <- plotscore + theme(axis.text.x=element_text(size=6, colour = "black"))
         plotscore <- plotscore + scale_x_date(limits=c(temp$DATE[1],temp$DATE[length(temp$DATE)]), 
                                               breaks=seq(temp$DATE[1],temp$DATE[length(temp$DATE)],length.out=8),
-                                              date_labels="%m/%d/%Y")
-        plotscore <- plotscore + scale_y_continuous(limits=c(0,ceiling(max(temp$SEIZURE_SCORE_30_DAYS)/50)*50),
-                                                    breaks=seq(0,ceiling(max(temp$SEIZURE_SCORE_30_DAYS)/50)*50,
-                                                               length.out=ceiling(max(temp$SEIZURE_SCORE_30_DAYS)/50)+1))
-        file <- gsub(" ","",paste(patient,"_SEIZURE_SCORE_GRAPH.jpeg"))
+                                              date_labels="%m/%d/%y")
+        plotscore <- plotscore + scale_y_continuous(limits=c(0,ceiling(max(temp$SEIZURE_SCORE_30)/50)*50),
+                                                    breaks=seq(0,ceiling(max(temp$SEIZURE_SCORE_30)/50)*50,
+                                                               length.out=ceiling(max(temp$SEIZURE_SCORE_30)/50)+1))
+        plotscore <- plotscore + theme_bw() +
+          theme(axis.text.x = element_text(size=11, colour = "black"),
+                axis.title.x = element_text(size=12),
+                axis.text.y = element_text(size=11, colour = "black"),
+                axis.title.y = element_text(size=12),
+                title = element_text(size=12, hjust = 0.5),
+                plot.title=element_text(size=12, hjust=0.5),
+                legend.position="bottom",
+                legend.background=element_rect(fill="white", colour="black"),
+                legend.text=element_text(size=11),
+                legend.key.width=unit(2, "line"))
+        
+        file <- gsub(" ","",paste(patient,"_SEIZURE_SCORE_GRAPH.png"))
         ggsave(plotscore,filename=file,width=6,height=4)
         
-        print(paste(gsub(" ","",paste(patient,"_SEIZURE_SCORE_GRAPH.jpeg")),"created and saved"))
+        print(paste(gsub(" ","",paste(patient,"_SEIZURE_SCORE_GRAPH.png")),"created and saved"))
       }
       
       setwd(c)
@@ -145,7 +167,7 @@ calculate_seizure_response <- function(patient,data,x,sourcedata,ranking) {
         directory <- readline(prompt="Enter here: ")
         setwd(directory)
       }
-      
+      results <- data.frame(results[,1:8], results[,12:13])
       print(paste("Saving seizure clinical outcome table as",gsub(" ","",paste(patient,"_SEIZURE_DATA_CLINICAL.xlsx")),"in directory",getwd()))
       xlsx <- "SEIZURE_DATA_CLINICAL.xlsx"
       xlsx <- gsub(" ","",paste(patient,"_",xlsx))
