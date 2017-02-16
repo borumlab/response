@@ -1,3 +1,8 @@
+
+------------------------------------------------------------------------
+
+output: github\_document ---
+
 ### R/clinicalresponse
 
 The aim of this package is to all clinics caring for patients with epilepsy to be able to calculate various response values using collected data. Currently this package calculates a seizure score, med score, and outcome and can be used to provide feedback to clinicians and caregivers on the seizure and med progress of patients receiving a therapy for epilepsy.
@@ -166,9 +171,9 @@ MED_RANKING_SOURCE
 
 Your data will need to be organized as these tables are in order for the scripts to function properly. For the tables with prefix "PATIENT1", each individual patient will have a file of that type storing that data that is unique to them, replacing "PATIENT1" with the identifier that you wish to use for that patient. There will be only one of the other three table: the MED\_RANKING\_SOURCE.xlsx file will be the same for all patients, whereas the CLINIC\_VISIT\_SOURCE.xlsx and the DEMOGRAPHICS\_SOURCE.xlsx files will store data for all patients within the same files. When you create your Excel files, they will all need to have the same name as given to the Example data frames seen here, with the exception of replacing "PATIENT1" with each patient's unique identifier. For more information about creating your files and on entering data, please read the README DATA ENTRY word document in this package folder.
 
-#### Calculating seizure response values
+#### Calculating seizure score values
 
-The first step in calculating seizure response values will be to obtain the seizure load. In this process, seizure load is defined as \[include definition of seizure load here\] per day. Also of interest is seizure number, which is the number of seizures that a patient has per day. These values will be needed in order to calculate seizure response values.
+The first step in calculating seizure score values will be to obtain the seizure load. In this process, seizure load is defined as sum of ranking points for seizure characteristics (seizure type, seizure length, seizure severity, other seizure variables) per seizur per day. Also of interest is seizure number or seizure frequency, which is the number of seizures that a patient has per day. These values will be needed in order to calculate seizure score values.
 
 To calculate daily seizure loads and seizure numbers, type this into your R console:
 
@@ -220,7 +225,7 @@ Once daily seizure loads have been calculated, you will be asked if you wish to 
 
     ## Enter here: yes
 
-If you were to type no here, we would skip this step and move on to the calculation of seizure response. If you typed yes, you will be asked where you would like to save the file.
+If you were to type no here, we would skip this step and move on to the calculation of seizure score. If you typed yes, you will be asked where you would like to save the file.
 
     ## [1] "Input the directory that you wish to save this patient's SEIZURE_LOAD file in"
 
@@ -238,13 +243,13 @@ And then you will be given the chance to open and view your file for review. If 
 
     ## Enter here: OKAY
 
-Next, you will use the daily seizure loads in order to calculate seizure response values. These values include percent seizure free (percent of days without seizures during baseline time period or a 30-day time period), seizure response per day (percent change in seizure days from baseline to a day on therapy) and seizure response per 30 day period (percent change in seizure days from baseline to a 30 day time period on therapy), percent seizure free response per 30 day period (percent change in seizure freedom from baseline to 30 day time period on therapy), seizure score per 30 day period (percent change in seizure free and seizure days from baseline to a 30 day time period on therapy), and seizure number response per day (percent change in seizure days from baseline to a day on therapy) and seizure response per 30 day period (percent change in seizure days from baseline to a 30 day time period on therapy). The formulas used to calculate these values can be found in the EQUATIONS word document. Note that this process will only occur if the patient has days classified as therapy days.
+Next, you will use the daily seizure loads in order to calculate seizure response values. These values include seizure score per day (percent change in seizure load for seizure days from baseline to a day on therapy), seizure score per 30 day period (percent change in seizure load for seizure free and seizure days from baseline to a 30 day time period on therapy), and seizure number score per day (percent change in seizure number for seizure days from baseline to a day on therapy) and seizure score per 30 day period (percent change in seizure number for seizure days and seizure fre days from baseline to a 30 day time period on therapy). The formulas used to calculate these values can be found in the EQUATIONS word document. Note that this process will only occur if the patient has days classified as therapy days.
 
     ## [1] "The percentage of baseline days with no seizures is: [number]%"
 
-    ## [1] "Response and scores have been calculated"
+    ## [1] "Scores have been calculated"
 
-If the patient has a baseline day with seizure load greater than 0, a scatter plot of the daily seizure responses will be created, and if the patient has any therapy days, then a line plot of the seizure scores per 30 days will be created. You will first be asked where the DEMOGRAPHICS\_SOURCE.xlsx file is (this is so that the patient's name can be drawn from the file and displayed on the graphs).
+If the patient has a baseline day with seizure load greater than 0 and has been on therapy, then a line graph of the seizure score per day and seizure score per 30 days will be created. You will first be asked where the DEMOGRAPHICS\_SOURCE.xlsx file is (this is so that the patient's name can be drawn from the file and displayed on the graphs).
 
     ## [1] "Input the directory that you wish to draw the DEMOGRAPHICS_SOURCE file from"
 
@@ -266,13 +271,13 @@ You will then be asked if you would like the graphs to be saved in the same fold
 
 Then your graphs will be created and saved.
 
-    ## [1] "PATIENT1_SEIZURE_DAILY_GRAPH.jpeg created and saved in the patient folder"
+    ## [1] "PATIENT1_SEIZURE_DAILY_GRAPH.png created and saved in the patient folder"
 
-    ## [1] "PATIENT1_SEIZURE_SCORE_GRAPH.jpeg created and saved in the patient folder"
+    ## [1] "PATIENT1_SEIZURE_SCORE_GRAPH.png created and saved in the patient folder"
 
 ![](README_files/figure-markdown_github/unnamed-chunk-19-1.png)![](README_files/figure-markdown_github/unnamed-chunk-19-2.png)
 
-Finally, the seizure response values will be saved to your computer. You will be asked if you would like this file to be saved in the same folder as the SEIZURE\_LOAD.xlsx file. Type 'yes' if you do, or type 'no' if you would like to save it somewhere else. If you type 'no', you will be asked where you would like this file to be saved.
+Finally, the seizure score values will be saved to your computer. You will be asked if you would like this file to be saved in the same folder as the SEIZURE\_LOAD.xlsx file. Type 'yes' if you do, or type 'no' if you would like to save it somewhere else. If you type 'no', you will be asked where you would like this file to be saved.
 
     ## [1] "Type 'yes' if you wish to save this patient's SEIZURE_DATA_CLINICAL file in the same folder as this patient's SEIZURE_LOAD file. Type 'no' if you would like for it to be in a different folder"
 
@@ -290,11 +295,11 @@ If your patient does not have any days labeled as therapy days, then this will p
 
     ## [1] "No therapy days, therefore response and score values will not be calculated"
 
-In this case, you will not be given any seizure reponse output.
+In this case, you will not be given any seizure score output.
 
-#### Calculating med response values
+#### Calculating med score values
 
-Similarly to seizure response, the first step in calculating med response values will be to obtain the med load. In this process, med load is defined as \[include definition of med load here\] per day. Also of interest is med number, which is the number of meds prescribed to a patient per day. These values will be needed in order to calculate med response values.
+Similarly to seizure score, the first step in calculating med score values will be to obtain the med load. In this process, med load is defined as the sum of prescribed med dose divided by minimum med dose (from clinical pharmacology) per patient weight (kg) per med per day. Also of interest is med number or med frequency, which is the number of meds prescribed to a patient per day. These values will be needed in order to calculate med response values.
 
 To calculate daily med loads and med numbers, type this into your R console:
 
@@ -362,7 +367,13 @@ Once the med raw data table, the med ranking table, the anthropometrics table, a
 
     ## [1] "Calculating med load per day, please wait..."
 
-Once daily med loads have been calculated, you will be asked if you wish to save a PATIENT1\_MED\_LOAD.xlsx file on your computer.
+Once daily med loads have been calculated, you will see that a med load graph was saved to the file location.
+
+    ## [1] "PATIENT1_MED_LOAD_GRAPH.png created and saved in the patient folder"
+
+![](README_files/figure-markdown_github/unnamed-chunk-29-1.png)
+
+Once the med load graph has been saved, you will be asked if you wish to save a PATIENT1\_MED\_LOAD.xlsx file on your computer.
 
     ## [1] "Would you like to save a temporary file to look at the med loads?"
 
@@ -370,7 +381,11 @@ Once daily med loads have been calculated, you will be asked if you wish to save
 
     ## Enter here: yes
 
-If you were to type no here, we would skip this step and move on to the calculation of med response. If you typed yes, you will be asked where you would like to save the file.
+If you were to type no here, we would skip this step and move on to the calculation of med score. If you typed yes, you will be asked where you would like to save the file.
+
+    ## [1] "Type 'yes' if you wish to save the MED_LOAD file in the same folder as this patient's MED_DATA_SOURCE table. Type 'no' if it is in a different folder"
+
+    ## Enter here: no
 
     ## [1] "Input the directory that you wish to save this patient's MED_LOAD file from"
 
@@ -378,7 +393,7 @@ If you were to type no here, we would skip this step and move on to the calculat
 
     ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
 
-    ## [1] "Saving seizure load table as PATIENT1_MED_LOAD.xlsx in directory C:/Desktop/Patient Folder/PATIENT1/Data/"
+    ## [1] "Saving med load table as PATIENT1_MED_LOAD.xlsx in directory C:/Desktop/Patient Folder/PATIENT1/Data/"
 
 And then you will be given the chance to open and view your file for review. If you are satisfied and would like to move on to seizure response calculation, type 'OKAY', otherwise, you can type 'QUIT' to end the script.
 
@@ -388,11 +403,9 @@ And then you will be given the chance to open and view your file for review. If 
 
     ## Enter here: OKAY
 
-Next, you will use the daily med loads in order to calculate med response values. These values include percent med free (percent of days without meds during baseline time period or a 30-day time period), med response per day (percent change in med days from baseline to a day on therapy) and med response per 30 day period (percent change in med days from baseline to a 30 day time period on therapy)), percent med free response per 30 day period (percent change in med freedom from baseline to 30 day time period on therapy), med score per 30 day period (percent change in med free and med days from baseline to a 30 day time period on therapy), and med number response per day and per 30 day period (percent change in seizure days from baseline to a 30 day time period on therapy). The formulas used to calculate these values can be found in the EQUATIONS word document. Note that this process will only occur if the patient has days classified as therapy days.
+Next, you will use the daily med loads in order to calculate med score values. These values include med score per day (percent change in med load for med days from baseline to a day on therapy), med score per 30 day period (percent change in med load for med free and med days from baseline to a 30 day time period on therapy), and med number score per day (percent change in med number for med days from baseline to a day on therapy), and med score per 30 day period (percent change in med number for med free and med days from baseline to a 30 day time period on therapy). The formulas used to calculate these values can be found in the EQUATIONS word document. Note that this process will only occur if the patient has days classified as therapy days.
 
-    ## [1] "The percentage of baseline days with no meds is: [number]%"
-
-    ## [1] "Response and scores have been calculated"
+    ## [1] "Scores have been calculated"
 
 You will be asked if you would like the graphs to be saved in the same folder as the MED\_LOAD.xlsx file. Type 'yes' if you do, or type 'no' if you would like to save it somewhere else. If you type 'no', you will be asked where you would like this file to be saved.
 
@@ -408,13 +421,13 @@ You will be asked if you would like the graphs to be saved in the same folder as
 
 Then the graphs will be created and saved.
 
-    ## [1] "PATIENT1_MED_DAILY_GRAPH.jpeg created and saved"
+    ## [1] "PATIENT1_MED_DAILY_GRAPH.png created and saved"
 
-    ## [1] "PATIENT1_MED_SCORE_GRAPH.jpeg created and saved"
+    ## [1] "PATIENT1_MED_SCORE_GRAPH.png created and saved"
 
-![](README_files/figure-markdown_github/unnamed-chunk-34-1.png)![](README_files/figure-markdown_github/unnamed-chunk-34-2.png)
+![](README_files/figure-markdown_github/unnamed-chunk-35-1.png)![](README_files/figure-markdown_github/unnamed-chunk-35-2.png)
 
-Finally, the med response values will be saved to your computer. You will be asked if you would like this file to be saved in the same folder as the MED\_LOAD.xlsx file. Type 'yes' if you do, or type 'no' if you would like to save it somewhere else. If you type 'no', you will be asked where you would like this file to be saved.
+Finally, the med score values will be saved to your computer. You will be asked if you would like this file to be saved in the same folder as the MED\_LOAD.xlsx file. Type 'yes' if you do, or type 'no' if you would like to save it somewhere else. If you type 'no', you will be asked where you would like this file to be saved.
 
     ## [1] "Type 'yes' if you wish to save this patient's MED_DATA_CLINICAL file in the same folder as this patient's MED_LOAD file. Type 'no' if you would like for it to be in a different folder"
 
@@ -426,7 +439,7 @@ Finally, the med response values will be saved to your computer. You will be ask
 
     ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
 
-    ## [1] "Saving seizure clinical outcome table as PATIENT1_MED_DATA_CLINICAL in directory C:/Desktop/Patient Folder/PATIENT1/Data/"
+    ## [1] "Saving med clinical outcome table as PATIENT1_MED_DATA_CLINICAL in directory C:/Desktop/Patient Folder/PATIENT1/Data/"
 
 #### Calculating outcome values
 
@@ -506,7 +519,7 @@ Once the outcome values are calculated, you will be asked if you would like to s
 
     ## [1] "Saving data clinical outcome table as PATIENT1_OUTCOME_DATA_CLINICAL.xlsx in directory C:/Desktop/Patient Folder/PATIENT1/Data/"
 
-R will then create for you three bar graphs: one for seizures, one for meds, and one for outcome. These graphs will show you the percentage of each clinic period that were seizure/med/outcome free, 0-50% of what was observed during baseline, 50-100% of what was observed during baseline, or was worse than what was observed during baseline. Additionally, a table storing the values used to make each of those three graphs will be created and saved.
+R will then create for you three bar graphs: one for seizures, one for meds, and one for outcome. These graphs will show you the percentage of each clinic period that were 0-10% of what was observed during baseline, 10-80% of what was observed during baseline, or &gt;80% than what was observed during baseline. Additionally, a table storing the values used to make each of those three graphs will be created and saved.
 
 You will be asked where you would like to save these graphs and this file.
 
@@ -528,7 +541,7 @@ Then the graphs will be created and saved.
 
     ## [1] "Outcome bar graph created and saved"
 
-![](README_files/figure-markdown_github/unnamed-chunk-44-1.png)![](README_files/figure-markdown_github/unnamed-chunk-44-2.png)![](README_files/figure-markdown_github/unnamed-chunk-44-3.png)
+![](README_files/figure-markdown_github/unnamed-chunk-45-1.png)![](README_files/figure-markdown_github/unnamed-chunk-45-2.png)![](README_files/figure-markdown_github/unnamed-chunk-45-3.png)
 
 And then the MED\_SEIZURE\_OUTCOME\_BAR\_TABLE.xlsx file will be saved for you. You will be asked where you would like for this to be saved beforehand.
 
