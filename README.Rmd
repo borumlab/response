@@ -1,9 +1,9 @@
 ---
 output:
-  html_document: default
+  word_document: default
   pdf_document:
     variant: markdown_github
-  word_document: default
+  html_document: default
 ---
 
 ### R/clinicalresponse
