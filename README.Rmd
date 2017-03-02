@@ -1,10 +1,8 @@
 ---
-output:
-  word_document: default
-  pdf_document:
-    variant: markdown_github
-  html_document: default
+
+output: github_document
 ---
+
 
 ### R/clinicalresponse
 
@@ -19,6 +17,20 @@ library(xlsx)
 ```
 
 Note that this package makes use of the rJava package in order to enable you to read Excel (xlsx) files into your R session and save Excel (xlsx) files onto your computer. You will need to ensure that you have Java installed on your computer and that the version of R or RStudio you are using matches the version of Java that you have (in RStudio, click on Tools -> Global Options -> General to change the version of R you are using if necessary).
+
+Note: openxlsx package was updated to version 4 on 01/09/2017. This new version does not work with the package. To install the previous version, versio 3.0, please follow these instructions:
+1. Type this into your console:
+```{r eval=FALSE}
+.libPaths()
+```
+2. Navigate to the location of saved packages on your computer.
+3. Delete the openxlsx package (you will need to close out of R in order to do this)
+4. Go to this website https://cran.r-project.org/web/packages/openxlsx/index.html and download openxlsx_3.0.0.zip into the location of saved packages on your computer.
+5. Open R and type this into your console:
+```{r eval=FALSE}
+library(openxlsx")
+```
+
 
 To install the package, type these lines of code into your R console:
 
@@ -36,6 +48,8 @@ library(clinicalresponse)
 #### Data Dictionary
 
 There are various Excel tables that will be needed to run the scripts in this package, and each script will give some output, to include Excel files and for some scripts, at least one graph (line plots and bar graphs created using the [ggplot2](https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf) package). A description of each file needed to run the scripts, as well as the output Excel files, can be found in the DATA_DICTIONARY.xlsx file that is included in this package.
+
+The blank excel sheets for you to populate your patient data with are located https://github.com/borumlab/response/Source Sheets. Please save this excel sheets on your computer.
 
 #### Example Data
 
@@ -62,6 +76,8 @@ table
 
 Your data will need to be organized as these tables are in order for the scripts to function properly. For the tables with prefix "PATIENT1", each individual patient will have a file of that type storing that data that is unique to them, replacing "PATIENT1" with the identifier that you wish to use for that patient. There will be only one of the other three table: the MED_RANKING_SOURCE.xlsx file will be the same for all patients, whereas the CLINIC_VISIT_SOURCE.xlsx and the DEMOGRAPHICS_SOURCE.xlsx files will store data for all patients within the same files. When you create your Excel files, they will all need to have the same name as given to the Example data frames seen here, with the exception of replacing "PATIENT1" with each patient's unique identifier. For more information about creating your files and on entering data, please read the README DATA ENTRY word document in this package folder.
 
+You may also find the excel sheets in https://github.com/borumlab/response/Example Patient excel sheets folder and save them to your local drive so that you may test the package. Make sure you do not save these files in a zip folder.
+
 #### Calculating seizure score values
 
 The first step in calculating seizure score values will be to obtain the seizure load. In this process, seizure load is defined as sum of ranking points for seizure characteristics (seizure type, seizure length, seizure severity, other seizure variables) per seizur per day. Also of interest is seizure number or seizure frequency, which is the number of seizures that a patient has per day. These values will be needed in order to calculate seizure score values.
@@ -81,7 +97,7 @@ print("Example: FILA")
 patient <- readline(prompt="Enter here: PATIENT1")
 ```
 
-Next, you will be asked to set the working directory in which the SEIZURE_DATA_SOURCE.xlsx file can be found in. 
+Next, you will be asked to set the working directory in which the SEIZURE_DATA_SOURCE.xlsx file can be found in. To set the working directory, navigate to the folder where you saved the patient Source Sheets and copy the file path. Paste the file path into the R console when prompted. Pay special attention to the direction of the slashes. Typically, when you paste the file path into the console the forward slashes will need to be changed to backward slashes.
 Once the location of this file has been set, the script will look for a file named [PATIENT1]_SEIZURE_DATA_SOURCE.xlsx and read it into R.
 
 ``` {r echo=FALSE}
@@ -340,7 +356,7 @@ directory <- readline(prompt="Enter here: C:/Desktop/Patient Folder/PATIENT1/Dat
 print("Saving med clinical outcome table as PATIENT1_MED_DATA_CLINICAL in directory C:/Desktop/Patient Folder/PATIENT1/Data/")
 ```
 
-#### Calculating outcome values
+#### Calculating outcome score values
 
 The final step is calculating outcome, which is defined as the average of the seizure score and med score, which will give you a description of a patient's general state concerning seizures and anti-epileptic medications at a given point in time. The specific formula used to calculate outcome can be found in the EQUATIONS word document. 
 

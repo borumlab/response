@@ -1,7 +1,8 @@
 
 ------------------------------------------------------------------------
 
-output: github\_document ---
+output: github\_document
+------------------------
 
 ### R/clinicalresponse
 
@@ -16,6 +17,21 @@ library(xlsx)
 ```
 
 Note that this package makes use of the rJava package in order to enable you to read Excel (xlsx) files into your R session and save Excel (xlsx) files onto your computer. You will need to ensure that you have Java installed on your computer and that the version of R or RStudio you are using matches the version of Java that you have (in RStudio, click on Tools -&gt; Global Options -&gt; General to change the version of R you are using if necessary).
+
+Note: openxlsx package was updated to version 4 on 01/09/2017. This new version does not work with the package. To install the previous version, versio 3.0, please follow these instructions: 1. Type this into your console:
+
+``` r
+.libPaths()
+```
+
+1.  Navigate to the location of saved packages on your computer.
+2.  Delete the openxlsx package (you will need to close out of R in order to do this)
+3.  Go to this website <https://cran.r-project.org/web/packages/openxlsx/index.html> and download openxlsx\_3.0.0.zip into the location of saved packages on your computer.
+4.  Open R and type this into your console:
+
+``` r
+library(openxlsx")
+```
 
 To install the package, type these lines of code into your R console:
 
@@ -33,6 +49,8 @@ library(clinicalresponse)
 #### Data Dictionary
 
 There are various Excel tables that will be needed to run the scripts in this package, and each script will give some output, to include Excel files and for some scripts, at least one graph (line plots and bar graphs created using the [ggplot2](https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf) package). A description of each file needed to run the scripts, as well as the output Excel files, can be found in the DATA\_DICTIONARY.xlsx file that is included in this package.
+
+The blank excel sheets for you to populate your patient data with are located <https://github.com/borumlab/response/Source> Sheets. Please save this excel sheets on your computer.
 
 #### Example Data
 
@@ -171,6 +189,8 @@ MED_RANKING_SOURCE
 
 Your data will need to be organized as these tables are in order for the scripts to function properly. For the tables with prefix "PATIENT1", each individual patient will have a file of that type storing that data that is unique to them, replacing "PATIENT1" with the identifier that you wish to use for that patient. There will be only one of the other three table: the MED\_RANKING\_SOURCE.xlsx file will be the same for all patients, whereas the CLINIC\_VISIT\_SOURCE.xlsx and the DEMOGRAPHICS\_SOURCE.xlsx files will store data for all patients within the same files. When you create your Excel files, they will all need to have the same name as given to the Example data frames seen here, with the exception of replacing "PATIENT1" with each patient's unique identifier. For more information about creating your files and on entering data, please read the README DATA ENTRY word document in this package folder.
 
+You may also find the excel sheets in <https://github.com/borumlab/response/Example> Patient excel sheets folder and save them to your local drive so that you may test the package. Make sure you do not save these files in a zip folder.
+
 #### Calculating seizure score values
 
 The first step in calculating seizure score values will be to obtain the seizure load. In this process, seizure load is defined as sum of ranking points for seizure characteristics (seizure type, seizure length, seizure severity, other seizure variables) per seizur per day. Also of interest is seizure number or seizure frequency, which is the number of seizures that a patient has per day. These values will be needed in order to calculate seizure score values.
@@ -187,27 +207,19 @@ First, the function will prompt you to enter some unique identifier (e.g. FiLa, 
 
     ## [1] "Example: FILA"
 
-    ## Enter here: PATIENT1
-
-Next, you will be asked to set the working directory in which the SEIZURE\_DATA\_SOURCE.xlsx file can be found in. Once the location of this file has been set, the script will look for a file named \[PATIENT1\]\_SEIZURE\_DATA\_SOURCE.xlsx and read it into R.
+Next, you will be asked to set the working directory in which the SEIZURE\_DATA\_SOURCE.xlsx file can be found in. To set the working directory, navigate to the folder where you saved the patient Source Sheets and copy the file path. Paste the file path into the R console when prompted. Pay special attention to the direction of the slashes. Typically, when you paste the file path into the console the forward slashes will need to be changed to backward slashes. Once the location of this file has been set, the script will look for a file named \[PATIENT1\]\_SEIZURE\_DATA\_SOURCE.xlsx and read it into R.
 
     ## [1] "Input the directory that you wish to draw this patient's SEIZURE_DATA_SOURCE file from"
 
     ## [1] "Example: C:/Folder_Name/"
 
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
-
 Then, R will need to load in the SEIZURE\_RANKING\_SOURCE.xlsx file. You will be asked whether this file exists in the same folder as the SEIZURE\_DATA\_SOURCE.xlsx file or not. If so, type 'yes'. If not, type 'no', and you will be prompted to specify the folder in which this file can be found on your computer.
 
     ## [1] "Type 'yes' if this patient's SEIZURE_RANKING_SOURCE file can be found in the same folder as the SEIZURE_DATA_SOURCE table. Type 'no' if it is in a different folder"
 
-    ## Enter here: no
-
     ## [1] "Input the directory that you wish to draw this patient's SEIZURE_RANKING_SOURCE file from"
 
     ## [1] "Example: C:/Folder_Name/"
-
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Ranking/
 
 Once the seizure raw data table and the seizure ranking table have been loaded into R, the calculation of seizure load will begin. As each step is done, you will see the following output in your console:
 
@@ -223,15 +235,11 @@ Once daily seizure loads have been calculated, you will be asked if you wish to 
 
     ## [1] "Type 'YES' to save a file to look at, type 'NO' to move onto next step"
 
-    ## Enter here: yes
-
 If you were to type no here, we would skip this step and move on to the calculation of seizure score. If you typed yes, you will be asked where you would like to save the file.
 
     ## [1] "Input the directory that you wish to save this patient's SEIZURE_LOAD file in"
 
     ## [1] "Example: C:/Folder_Name/"
-
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
 
     ## [1] "Saving seizure load table as PATIENT1_SEIZURE_LOAD.xlsx in directory C:/Desktop/Patient Folder/PATIENT1/Data/"
 
@@ -240,8 +248,6 @@ And then you will be given the chance to open and view your file for review. If 
     ## [1] "Type 'OKAY' whenever you are ready to move on to the next step"
 
     ## [1] "Or type 'QUIT' if you would like to exit"
-
-    ## Enter here: OKAY
 
 Next, you will use the daily seizure loads in order to calculate seizure response values. These values include seizure score per day (percent change in seizure load for seizure days from baseline to a day on therapy), seizure score per 30 day period (percent change in seizure load for seizure free and seizure days from baseline to a 30 day time period on therapy), and seizure number score per day (percent change in seizure number for seizure days from baseline to a day on therapy) and seizure score per 30 day period (percent change in seizure number for seizure days and seizure fre days from baseline to a 30 day time period on therapy). The formulas used to calculate these values can be found in the EQUATIONS word document. Note that this process will only occur if the patient has days classified as therapy days.
 
@@ -255,19 +261,13 @@ If the patient has a baseline day with seizure load greater than 0 and has been 
 
     ## [1] "Example: C:/Folder_Name/"
 
-    ## Enter here:  C:/Desktop/Patient Folder/PATIENT1/Demographics/
-
 You will then be asked if you would like the graphs to be saved in the same folder as the SEIZURE\_LOAD.xlsx file. Type 'yes' if you do, or type 'no' if you would like to save it somewhere else. If you type 'no', you will be asked where you would like this file to be saved.
 
     ## [1] "Type 'yes' if you wish to save all graphs in the same folder as this patient's SEIZURE_LOAD file. Type 'no' if you would like for them to be in a different folder"
 
-    ## Enter here: no
-
     ## [1] "Input the directory that you wish to save this patient's seizure graphs in"
 
     ## [1] "Example: C:/Folder_Name/"
-
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
 
 Then your graphs will be created and saved.
 
@@ -275,19 +275,15 @@ Then your graphs will be created and saved.
 
     ## [1] "PATIENT1_SEIZURE_SCORE_GRAPH.png created and saved in the patient folder"
 
-![](README_files/figure-markdown_github/unnamed-chunk-19-1.png)![](README_files/figure-markdown_github/unnamed-chunk-19-2.png)
+![](README_files/figure-markdown_github/unnamed-chunk-21-1.png)![](README_files/figure-markdown_github/unnamed-chunk-21-2.png)
 
 Finally, the seizure score values will be saved to your computer. You will be asked if you would like this file to be saved in the same folder as the SEIZURE\_LOAD.xlsx file. Type 'yes' if you do, or type 'no' if you would like to save it somewhere else. If you type 'no', you will be asked where you would like this file to be saved.
 
     ## [1] "Type 'yes' if you wish to save this patient's SEIZURE_DATA_CLINICAL file in the same folder as this patient's SEIZURE_LOAD file. Type 'no' if you would like for it to be in a different folder"
 
-    ## Enter here: no
-
     ## [1] "Input the directory that you wish to save this patient's SEIZURE_DATA_CLINICAL file in"
 
     ## [1] "Example: C:/Folder_Name/"
-
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
 
     ## [1] "Saving seizure clinical outcome table as PATIENT1_SEIZURE_DATA_CLINICAL in directory C:/Desktop/Patient Folder/PATIENT1/Data/"
 
@@ -313,51 +309,35 @@ First, the function will prompt you to enter some unique identifier (e.g. FiLa, 
 
     ## [1] "Example: FILA"
 
-    ## Enter here: PATIENT1
-
 Next, you will be asked to set the work directory in which the DEMOGRAPHICS\_SOURCE.xlsx file can be found in. Once the location of this file has been set, the script will look for a file named DEMOGRAPHICS\_SOURCE.xlsx and read it into R.
 
     ## [1] "Input the directory that you wish to draw this patient's DEMOGRAPHICS_SOURCE file from"
 
     ## [1] "Example: C:/Folder_Name/"
 
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Demographics/
-
 Then, R will need to load in the MED\_RANKING\_SOURCE.xlsx file. You will be asked whether this file exists in the same folder as the DEMOGRAPHICS\_SOURCE.xlsx file or not. If so, type 'yes'. If not, type 'no', and you will be prompted to specify the folder in which this file can be found on your computer.
 
     ## [1] "Type 'yes' if the MED_RANKING_SOURCE file can be found in the same folder as the DEMOGRAPHICS_SOURCE table. Type 'no' if it is in a different folder"
-
-    ## Enter here: no
 
     ## [1] "Input the directory that you wish to draw this patient's MED_RANKING_SOURCE file from"
 
     ## [1] "Example: C:/Folder_Name/"
 
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Ranking/
-
 Then, R will need to load in the ANTHROPOMETRICS\_SOURCE.xlsx file. Since med load requires milligrams of medication per kilogram weight of the patient, weight data needs to be incorporated into the med load calculations. You will be asked whether this file exists in the same folder as the MED\_RANKING\_SOURCE.xlsx file or not. If so, type 'yes'. If not, type 'no', and you will be prompted to specify the folder in which this file can be found on your computer.
 
     ## [1] "Type 'yes' if this patient's ANTHROPOMETRICS_SOURCE file can be found in the same folder as the MED_RANKING_SOURCE table. Type 'no' if it is in a different folder"
-
-    ## Enter here: no
 
     ## [1] "Input the directory that you wish to draw this patient's ANTHROPOMETRICS_SOURCE file from"
 
     ## [1] "Example: C:/Folder_Name/"
 
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Anthropometrics/
-
 Lastly, R will need to load in the MED\_DATA\_SOURCE.xlsx file. You will be asked whether this file exists in the same folder as the ANTHROPOMETRICS\_SOURCE.xlsx file or not. If so, type 'yes'. If not, type 'no', and you will be prompted to specify the folder in which this file can be found on your computer.
 
     ## [1] "Type 'yes' if this patient's MED_DATA_SOURCE file can be found in the same folder as this patient's ANTHROPOMETRICS_SOURCE table. Type 'no' if it is in a different folder"
 
-    ## Enter here: no
-
     ## [1] "Input the directory that you wish to draw this patient's MED_DATA_SOURCE file from"
 
     ## [1] "Example: C:/Folder_Name/"
-
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
 
 Once the med raw data table, the med ranking table, the anthropometrics table, and the demographics table have been loaded into R, the calculation of med load will begin. As each step is done, you will see the following output in your console:
 
@@ -371,7 +351,7 @@ Once daily med loads have been calculated, you will see that a med load graph wa
 
     ## [1] "PATIENT1_MED_LOAD_GRAPH.png created and saved in the patient folder"
 
-![](README_files/figure-markdown_github/unnamed-chunk-29-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-31-1.png)
 
 Once the med load graph has been saved, you will be asked if you wish to save a PATIENT1\_MED\_LOAD.xlsx file on your computer.
 
@@ -379,19 +359,13 @@ Once the med load graph has been saved, you will be asked if you wish to save a 
 
     ## [1] "Type 'YES' to save a file to look at, type 'NO' to move onto next step"
 
-    ## Enter here: yes
-
 If you were to type no here, we would skip this step and move on to the calculation of med score. If you typed yes, you will be asked where you would like to save the file.
 
     ## [1] "Type 'yes' if you wish to save the MED_LOAD file in the same folder as this patient's MED_DATA_SOURCE table. Type 'no' if it is in a different folder"
 
-    ## Enter here: no
-
     ## [1] "Input the directory that you wish to save this patient's MED_LOAD file from"
 
     ## [1] "Example: C:/Folder_Name/"
-
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
 
     ## [1] "Saving med load table as PATIENT1_MED_LOAD.xlsx in directory C:/Desktop/Patient Folder/PATIENT1/Data/"
 
@@ -401,8 +375,6 @@ And then you will be given the chance to open and view your file for review. If 
 
     ## [1] "Or type 'QUIT' if you would like to exit"
 
-    ## Enter here: OKAY
-
 Next, you will use the daily med loads in order to calculate med score values. These values include med score per day (percent change in med load for med days from baseline to a day on therapy), med score per 30 day period (percent change in med load for med free and med days from baseline to a 30 day time period on therapy), and med number score per day (percent change in med number for med days from baseline to a day on therapy), and med score per 30 day period (percent change in med number for med free and med days from baseline to a 30 day time period on therapy). The formulas used to calculate these values can be found in the EQUATIONS word document. Note that this process will only occur if the patient has days classified as therapy days.
 
     ## [1] "Scores have been calculated"
@@ -411,13 +383,9 @@ You will be asked if you would like the graphs to be saved in the same folder as
 
     ## [1] "Type 'yes' if you wish to save all graphs in the same folder as this patient's MED_LOAD file. Type 'no' if you would like for them to be in a different folder"
 
-    ## Enter here: no
-
     ## [1] "Input the directory that you wish to save this patient's med graphs in"
 
     ## [1] "Example: C:/Folder_Name/"
-
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
 
 Then the graphs will be created and saved.
 
@@ -425,23 +393,19 @@ Then the graphs will be created and saved.
 
     ## [1] "PATIENT1_MED_SCORE_GRAPH.png created and saved"
 
-![](README_files/figure-markdown_github/unnamed-chunk-35-1.png)![](README_files/figure-markdown_github/unnamed-chunk-35-2.png)
+![](README_files/figure-markdown_github/unnamed-chunk-37-1.png)![](README_files/figure-markdown_github/unnamed-chunk-37-2.png)
 
 Finally, the med score values will be saved to your computer. You will be asked if you would like this file to be saved in the same folder as the MED\_LOAD.xlsx file. Type 'yes' if you do, or type 'no' if you would like to save it somewhere else. If you type 'no', you will be asked where you would like this file to be saved.
 
     ## [1] "Type 'yes' if you wish to save this patient's MED_DATA_CLINICAL file in the same folder as this patient's MED_LOAD file. Type 'no' if you would like for it to be in a different folder"
 
-    ## Enter here: no
-
     ## [1] "Input the directory that you wish to save this patient's MED_DATA_CLINICAL file in"
 
     ## [1] "Example: C:/Folder_Name/"
 
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
-
     ## [1] "Saving med clinical outcome table as PATIENT1_MED_DATA_CLINICAL in directory C:/Desktop/Patient Folder/PATIENT1/Data/"
 
-#### Calculating outcome values
+#### Calculating outcome score values
 
 The final step is calculating outcome, which is defined as the average of the seizure score and med score, which will give you a description of a patient's general state concerning seizures and anti-epileptic medications at a given point in time. The specific formula used to calculate outcome can be found in the EQUATIONS word document.
 
@@ -459,63 +423,43 @@ First, the function will prompt you to enter the unique identifier (e.g. FiLa, d
 
     ## [1] "Example: FILA"
 
-    ## Enter here: PATIENT1
-
 Next, you will be asked to set the work directory in which the CLINIC\_VISIT\_SOURCE.xlsx file can be found in. Once the location of this file has been set, the script will look for a file named CLINIC\_VISIT\_SOURCE.xlsx and read it into R.
 
     ## [1] "Input the directory that you wish to draw the CLINIC_VISIT_SOURCE file from"
 
     ## [1] "Example: C:/Folder_Name/"
 
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Clinic_Visit/
-
 Then, R will need to load in the DEMOGRAPHICS\_SOURCE.xlsx file. You will be asked whether this file exists in the same folder as the CLINIC\_VISIT\_SOURCE.xlsx file or not. If so, type 'yes'. If not, type 'no', and you will be prompted to specify the folder in which this file can be found on your computer.
 
     ## [1] "Type 'yes' if the DEMOGRAPHICS_SOURCE file can be found in the same folder as the CLINIC_VISIT_SOURCE table. Type 'no' if it is in a different folder"
-
-    ## Enter here: no
 
     ## [1] "Input the directory that you wish to draw the DEMOGRAPHICS_SOURCE file from"
 
     ## [1] "Example: C:/Folder_Name/"
 
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Demographics/
-
 Then, R will need to load in the SEIZURE\_DATA\_CLINICAL.xlsx file. You will be asked whether this file exists in the same folder as the DEMOGRAPHICS\_SOURCE.xlsx file or not. If so, type 'yes'. If not, type 'no', and you will be prompted to specify the folder in which this file can be found on your computer.
 
     ## [1] "Type 'yes' if this patient's SEIZURE_DATA_CLINICAL file can be found in the same folder as the DEMOGRAPHICS_SOURCE table. Type 'no' if it is in a different folder"
-
-    ## Enter here: no
 
     ## [1] "Input the directory that you wish to draw this patient's SEIZURE_DATA_CLINCAL file from"
 
     ## [1] "Example: C:/Folder_Name/"
 
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
-
 Lastly, R will need to load in the MED\_DATA\_CLINICAL.xlsx file. You will be asked whether this file exists in the same folder as the SEIZURE\_DATA\_CLINICAL.xlsx file or not. If so, type 'yes'. If not, type 'no', and you will be prompted to specify the folder in which this file can be found on your computer.
 
     ## [1] "Type 'yes' if this patient's MED_DATA_CLINICAL file can be found in the same folder as this patient's SEIZURE_DATA_CLINICAL table. Type 'no' if it is in a different folder"
-
-    ## Enter here: no
 
     ## [1] "Input the directory that you wish to draw this patient's MED_DATA_CLINCAL file from"
 
     ## [1] "Example: C:/Folder_Name/"
 
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
-
 Once the outcome values are calculated, you will be asked if you would like to save the OUTCOME\_DATA\_CLINICAL.xlsx file in the same location as the MED\_DATA\_CLINICAL.xlsx table. If so, type 'yes'. If not, type 'no' and you will be asked where you would like to save the file.
 
     ## [1] "Type 'yes' if you wish to save the OUTCOME_DATA_CLINICAL file in the same folder as this patient's MED_DATA_CLINICAL table. Type 'no' if you would like for it to be in a different folder"
 
-    ## Enter here: no
-
     ## [1] "Input the directory that you wish to save this patient's OUTCOME_DATA_CLINICAL file in"
 
     ## [1] "Example: C:/Folder_Name/"
-
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
 
     ## [1] "Saving data clinical outcome table as PATIENT1_OUTCOME_DATA_CLINICAL.xlsx in directory C:/Desktop/Patient Folder/PATIENT1/Data/"
 
@@ -525,13 +469,9 @@ You will be asked where you would like to save these graphs and this file.
 
     ## [1] "Type 'yes' if you wish to save all graphs in the same folder as this patient's OUTCOME_DATA_CLINICAL file. Type 'no' if you would like for it to be in a different folder"
 
-    ## Enter here: no
-
     ## [1] "Input the directory that you wish to save this patient's graphs and MED_SEIZURE_OUTCOME_BAR_TABLE file in"
 
     ## [1] "Example: C:/Folder_Name/"
-
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
 
 Then the graphs will be created and saved.
 
@@ -541,18 +481,14 @@ Then the graphs will be created and saved.
 
     ## [1] "Outcome bar graph created and saved"
 
-![](README_files/figure-markdown_github/unnamed-chunk-45-1.png)![](README_files/figure-markdown_github/unnamed-chunk-45-2.png)![](README_files/figure-markdown_github/unnamed-chunk-45-3.png)
+![](README_files/figure-markdown_github/unnamed-chunk-47-1.png)![](README_files/figure-markdown_github/unnamed-chunk-47-2.png)![](README_files/figure-markdown_github/unnamed-chunk-47-3.png)
 
 And then the MED\_SEIZURE\_OUTCOME\_BAR\_TABLE.xlsx file will be saved for you. You will be asked where you would like for this to be saved beforehand.
 
     ## [1] "Type 'yes' if you wish to save this patient's MED_SEIZURE_OUTCOME_BAR_TABLE file in the same folder as this patient's OUTCOME_DATA_CLINICAL file. Type 'no' if you would like for it to be in a different folder"
 
-    ## Enter here: no
-
     ## [1] "Input the directory that you wish to save this patient's MED_SEIZURE_OUTCOME_BAR_TABLE file in"
 
     ## [1] "Example: C:/Folder_Name/"
-
-    ## Enter here: C:/Desktop/Patient Folder/PATIENT1/Data/
 
     ## [1] "Saving med/seizure/outcome bar table as PATIENT1_MED_SEIZURE_OUTCOME_BAR_TABLE.xlsx in directory C:/Desktop/Patient Folder/PATIENT1/Data"
